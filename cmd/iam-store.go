@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	jsoniter "github.com/json-iterator/go"
@@ -166,6 +167,12 @@ type UserIdentity struct {
 	UpdatedAt   time.Time        `json:"updatedAt,omitempty"`
 }
 
+type UserPolicy struct {
+	OwnerBuckets      []string            `json:"own_buckets"`
+	AuthorizedBuckets map[string][]string `json:"authorized_vols" graphql:"-"` // mapping: bucket -> actions
+	mu                sync.RWMutex
+}
+
 func newUserIdentity(cred auth.Credentials) UserIdentity {
 	return UserIdentity{Version: 1, Credentials: cred, UpdatedAt: UTCNow()}
 }
@@ -284,10 +291,11 @@ type iamCache struct {
 	// map of policy names to policy definitions
 	iamPolicyDocsMap map[string]PolicyDoc
 
+	// username一般是用ak来表示，如果是临时用户，可能是name
 	// map of regular username to credentials
-	iamUsersMap map[string]UserIdentity
+	iamUsersMap map[string]UserIdentity // userName -> identity
 	// map of regular username to policy names
-	iamUserPolicyMap map[string]MappedPolicy
+	iamUserPolicyMap map[string]MappedPolicy // userName -> policies
 
 	// STS accounts are loaded on demand and not via the periodic IAM reload.
 	// map of STS access key to credentials
@@ -296,11 +304,11 @@ type iamCache struct {
 	iamSTSPolicyMap map[string]MappedPolicy
 
 	// map of group names to group info
-	iamGroupsMap map[string]GroupInfo
+	iamGroupsMap map[string]GroupInfo // groupName -> groupInfo
 	// map of user names to groups they are a member of
-	iamUserGroupMemberships map[string]set.StringSet
+	iamUserGroupMemberships map[string]set.StringSet // userName -> groups
 	// map of group names to policy names
-	iamGroupPolicyMap map[string]MappedPolicy
+	iamGroupPolicyMap map[string]MappedPolicy // groupName -> policies
 }
 
 func newIamCache() *iamCache {
@@ -1811,6 +1819,7 @@ func (store *IAMStoreSys) DeleteUsers(ctx context.Context, users []string) error
 	return nil
 }
 
+// 主要是在STS场景用
 // ParentUserInfo contains extra info about a the parent user.
 type ParentUserInfo struct {
 	subClaimValue string

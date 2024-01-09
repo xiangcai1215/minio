@@ -45,6 +45,7 @@ type metacacheManager struct {
 
 const metacacheMaxEntries = 5000
 
+// 异步保存缓存
 // initManager will start async saving the cache.
 func (m *metacacheManager) initManager() {
 	// Add a transient bucket.
@@ -66,6 +67,7 @@ func (m *metacacheManager) initManager() {
 			case <-GlobalContext.Done():
 				exit = true
 			}
+			// 定期更新缓存，每隔一分钟做一次清理
 			m.mu.RLock()
 			for _, v := range m.buckets {
 				if !exit {

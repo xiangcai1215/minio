@@ -225,6 +225,7 @@ func registerAPIRouter(router *mux.Router) {
 
 		// Object operations
 		// HeadObject
+		// .+正则至少出现一次，
 		router.Methods(http.MethodHead).Path("/{object:.+}").HandlerFunc(
 			collectAPIStats("headobject", maxClients(gz(httpTraceAll(api.HeadObjectHandler)))))
 		// CopyObjectPart

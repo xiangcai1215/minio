@@ -22,6 +22,8 @@ import (
 	"io"
 )
 
+// 记录请求详情，是不是记录body都日志，buf大小
+
 // RequestRecorder - records the
 // of a given io.Reader
 type RequestRecorder struct {

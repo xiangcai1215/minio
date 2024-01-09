@@ -58,6 +58,7 @@ func (er erasureObjects) getMultipartSHADir(bucket, object string) string {
 	return getSHA256Hash([]byte(pathJoin(bucket, object)))
 }
 
+// 这个函数返回这个对象的元数据，目前关联到对象的所有分片的元数据，
 // checkUploadIDExists - verify if a given uploadID exists and is valid.
 func (er erasureObjects) checkUploadIDExists(ctx context.Context, bucket, object, uploadID string, write bool) (fi FileInfo, metArr []FileInfo, err error) {
 	defer func() {
@@ -71,6 +72,7 @@ func (er erasureObjects) checkUploadIDExists(ctx context.Context, bucket, object
 	storageDisks := er.getDisks()
 
 	// Read metadata associated with the object from all disks.
+	// 每个分片的元数据
 	partsMetadata, errs := readAllFileInfo(ctx, storageDisks, minioMetaMultipartBucket,
 		uploadIDPath, "", false)
 
@@ -99,6 +101,7 @@ func (er erasureObjects) checkUploadIDExists(ctx context.Context, bucket, object
 	}
 
 	// Pick one from the first valid metadata.
+	// 整个对象的元数据
 	fi, err = pickValidFileInfo(ctx, partsMetadata, modTime, etag, quorum)
 	return fi, partsMetadata, err
 }
@@ -940,6 +943,8 @@ func (er erasureObjects) ListObjectParts(ctx context.Context, bucket, object, up
 func (er erasureObjects) CompleteMultipartUpload(ctx context.Context, bucket string, object string, uploadID string, parts []CompletePart, opts ObjectOptions) (oi ObjectInfo, err error) {
 	auditObjectErasureSet(ctx, object, &er)
 
+	// 底层实现是加锁来保证，在做completeMultiPart时候不允许有其他uploadPart操作。
+	// 这个相单于在元数据操作地方加锁，下面一个lockMap，特定key有自己的锁，并且锁有超时释放时间，
 	// Hold write locks to verify uploaded parts, also disallows any
 	// parallel PutObjectPart() requests.
 	uploadIDLock := er.NewNSLock(bucket, pathJoin(object, uploadID))
@@ -950,6 +955,7 @@ func (er erasureObjects) CompleteMultipartUpload(ctx context.Context, bucket str
 	ctx = wlkctx.Context()
 	defer uploadIDLock.Unlock(wlkctx)
 
+	// fi整个对象的元数据信息，包括所有part的元数据信息
 	fi, partsMetadata, err := er.checkUploadIDExists(ctx, bucket, object, uploadID, true)
 	if err != nil {
 		return oi, toObjectErr(err, bucket, object, uploadID)
@@ -1170,6 +1176,7 @@ func (er erasureObjects) CompleteMultipartUpload(ctx context.Context, bucket str
 		}
 	}
 
+	// 这里要事务支持。
 	// Hold namespace to complete the transaction
 	lk := er.NewNSLock(bucket, object)
 	lkctx, err := lk.GetLock(ctx, globalOperationTimeout)
@@ -1222,6 +1229,7 @@ func (er erasureObjects) CompleteMultipartUpload(ctx context.Context, bucket str
 		}
 	}
 
+	// 也会删除不需要的part
 	// Remove parts that weren't present in CompleteMultipartUpload request.
 	for _, curpart := range currentFI.Parts {
 		// Remove part.meta which is not needed anymore.
@@ -1238,6 +1246,7 @@ func (er erasureObjects) CompleteMultipartUpload(ctx context.Context, bucket str
 		}
 	}
 
+	// 如果没有错误，会删除所有的mul相关的数据
 	defer func() {
 		if err == nil {
 			er.deleteAll(context.Background(), minioMetaMultipartBucket, uploadIDPath)

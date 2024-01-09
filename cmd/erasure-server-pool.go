@@ -769,6 +769,7 @@ func (z *erasureServerPools) MakeBucket(ctx context.Context, bucket string, opts
 	}
 
 	// If it doesn't exist we get a new, so ignore errors
+	// 这里并没有在bucket的meta里面记录owner信息。
 	meta := newBucketMetadata(bucket)
 	meta.SetCreatedAt(opts.CreatedAt)
 	if opts.LockEnabled {

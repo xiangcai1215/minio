@@ -143,6 +143,7 @@ func SetReqInfo(ctx context.Context, req *ReqInfo) context.Context {
 	return context.WithValue(ctx, contextLogKey, req)
 }
 
+// 运行日志的信息
 // GetReqInfo returns ReqInfo if set.
 func GetReqInfo(ctx context.Context) *ReqInfo {
 	if ctx != nil {

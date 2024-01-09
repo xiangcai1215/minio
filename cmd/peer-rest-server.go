@@ -689,6 +689,7 @@ func (s *peerRESTServer) GetMetacacheListingHandler(w http.ResponseWriter, r *ht
 	logger.LogIf(ctx, msgp.Encode(w, &resp))
 }
 
+// 集群模式下，其他peer会更新这个peer的缓存，
 func (s *peerRESTServer) UpdateMetacacheListingHandler(w http.ResponseWriter, r *http.Request) {
 	if !s.IsValid(w, r) {
 		s.writeErrorResponse(w, errors.New("Invalid request"))

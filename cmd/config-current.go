@@ -507,6 +507,7 @@ func lookupConfigs(s config.Config, objAPI ObjectLayer) {
 	}
 }
 
+// 初始化请求api的默认配置，例如每个请求数量
 func applyDynamicConfigForSubSys(ctx context.Context, objAPI ObjectLayer, s config.Config, subSys string) error {
 	if objAPI == nil {
 		return errServerNotInitialized

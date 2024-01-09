@@ -145,6 +145,8 @@ func isValidRegion(reqRegion string, confRegion string) bool {
 
 // check if the access key is valid and recognized, additionally
 // also returns if the access key is owner/admin.
+// 请求参数，还是会经过IAM系统来获取所有用户信息，具体而已就是根据AK获取获取用户use identify信息。
+// 如果判断这个user是不是bucket的owner，或者有没有操作这个bucket的权限呢
 func checkKeyValid(r *http.Request, accessKey string) (auth.Credentials, bool, APIErrorCode) {
 	cred := globalActiveCred
 	if cred.AccessKey != accessKey {
@@ -174,8 +176,10 @@ func checkKeyValid(r *http.Request, accessKey string) (auth.Credentials, bool, A
 	}
 	cred.Claims = claims
 
+	//是owner是系统用户，对应minioadmin的管理员账号。
 	owner := cred.AccessKey == globalActiveCred.AccessKey || (cred.ParentUser == globalActiveCred.AccessKey && cred.AccessKey != siteReplicatorSvcAcc)
 	if owner && !globalAPIConfig.permitRootAccess() {
+		// 系统用户允许访问
 		// We disable root access and its service accounts if asked for.
 		return cred, owner, ErrAccessKeyDisabled
 	}

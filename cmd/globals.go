@@ -188,8 +188,11 @@ var (
 
 	globalBucketMetadataSys *BucketMetadataSys
 	globalBucketMonitor     *bandwidth.Monitor
-	globalPolicySys         *PolicySys
-	globalIAMSys            *IAMSys
+
+	// globalPolicy一般管理桶的策略
+	globalPolicySys *PolicySys
+	// 一般管理用户策略
+	globalIAMSys *IAMSys
 
 	globalLifecycleSys       *LifecycleSys
 	globalBucketSSEConfigSys *BucketSSEConfigSys
@@ -255,6 +258,7 @@ var (
 	// Time when the server is started
 	globalBootTime = UTCNow()
 
+	// 这是一个总用户，可以给所有用户授权和分配角色。minioadmin和minioadmin这个系统根目录
 	globalActiveCred auth.Credentials
 
 	// Captures if root credentials are set via ENV.

@@ -100,16 +100,17 @@ const (
 
 // Credentials holds access and secret keys.
 type Credentials struct {
-	AccessKey    string                 `xml:"AccessKeyId" json:"accessKey,omitempty" yaml:"accessKey"`
-	SecretKey    string                 `xml:"SecretAccessKey" json:"secretKey,omitempty" yaml:"secretKey"`
-	SessionToken string                 `xml:"SessionToken" json:"sessionToken,omitempty" yaml:"sessionToken"`
-	Expiration   time.Time              `xml:"Expiration" json:"expiration,omitempty" yaml:"-"`
-	Status       string                 `xml:"-" json:"status,omitempty"`
-	ParentUser   string                 `xml:"-" json:"parentUser,omitempty"`
-	Groups       []string               `xml:"-" json:"groups,omitempty"`
-	Claims       map[string]interface{} `xml:"-" json:"claims,omitempty"`
-	Name         string                 `xml:"-" json:"name,omitempty"`
-	Description  string                 `xml:"-" json:"description,omitempty"`
+	AccessKey    string    `xml:"AccessKeyId" json:"accessKey,omitempty" yaml:"accessKey"`
+	SecretKey    string    `xml:"SecretAccessKey" json:"secretKey,omitempty" yaml:"secretKey"`
+	SessionToken string    `xml:"SessionToken" json:"sessionToken,omitempty" yaml:"sessionToken"`
+	Expiration   time.Time `xml:"Expiration" json:"expiration,omitempty" yaml:"-"`
+	Status       string    `xml:"-" json:"status,omitempty"`
+	// ParentUser user for sts
+	ParentUser  string                 `xml:"-" json:"parentUser,omitempty"`
+	Groups      []string               `xml:"-" json:"groups,omitempty"`
+	Claims      map[string]interface{} `xml:"-" json:"claims,omitempty"`
+	Name        string                 `xml:"-" json:"name,omitempty"`
+	Description string                 `xml:"-" json:"description,omitempty"`
 
 	// Deprecated: In favor of Description - when reading credentials from
 	// storage the value of this field is placed in the Description field above
@@ -143,6 +144,8 @@ func (cred Credentials) IsExpired() bool {
 }
 
 // IsTemp - returns whether credential is temporary or not.
+// 临时用户使用STS token，并且过期时间不为0或者过期时间没有初始化，
+// 总的来说，就是必须保证有token，并且有过期时间
 func (cred Credentials) IsTemp() bool {
 	return cred.SessionToken != "" && !cred.Expiration.IsZero() && !cred.Expiration.Equal(timeSentinel)
 }
@@ -206,6 +209,7 @@ func ExpToInt64(expI interface{}) (expAt int64, err error) {
 	return expAt, err
 }
 
+// 这里生成随机AK和SK，在临时用户和iam里面都会用到
 // GenerateCredentials - creates randomly generated credentials of maximum
 // allowed length.
 func GenerateCredentials() (accessKey, secretKey string, err error) {
@@ -253,6 +257,7 @@ func GetNewCredentialsWithMetadata(m map[string]interface{}, tokenSecret string)
 
 // CreateNewCredentialsWithMetadata - creates new credentials using the specified access & secret keys
 // and generate a session token if a secret token is provided.
+// 生成用户的session token，这个tokenSecret，iam系统中传递的tokenSecret就是
 func CreateNewCredentialsWithMetadata(accessKey, secretKey string, m map[string]interface{}, tokenSecret string) (cred Credentials, err error) {
 	if len(accessKey) < accessKeyMinLen || len(accessKey) > accessKeyMaxLen {
 		return Credentials{}, ErrInvalidAccessKeyLength
@@ -277,6 +282,7 @@ func CreateNewCredentialsWithMetadata(accessKey, secretKey string, m map[string]
 	}
 	cred.Expiration = time.Unix(expiry, 0).UTC()
 
+	// 生成用户的session token，这个tokenSecret
 	cred.SessionToken, err = JWTSignWithAccessKey(cred.AccessKey, m, tokenSecret)
 	if err != nil {
 		return cred, err

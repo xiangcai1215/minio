@@ -54,7 +54,9 @@ func registerMetricsRouter(router *mux.Router) {
 	if prometheusAuthType(authType) == prometheusPublic {
 		auth = NoAuthMiddleware
 	}
+	//minio/prometheus/metrics 这个数据以及被废弃了，现在应该用的v2版本了
 	metricsRouter.Handle(prometheusMetricsPathLegacy, auth(metricsHandler()))
+
 	metricsRouter.Handle(prometheusMetricsV2ClusterPath, auth(metricsServerHandler()))
 	metricsRouter.Handle(prometheusMetricsV2BucketPath, auth(metricsBucketHandler()))
 	metricsRouter.Handle(prometheusMetricsV2NodePath, auth(metricsNodeHandler()))

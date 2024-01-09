@@ -225,7 +225,6 @@ type ObjectLayer interface {
 	Walk(ctx context.Context, bucket, prefix string, results chan<- ObjectInfo, opts ObjectOptions) error
 
 	// Object operations.
-
 	// GetObjectNInfo returns a GetObjectReader that satisfies the
 	// ReadCloser interface. The Close method runs any cleanup
 	// functions, so it must always be called after reading till EOF

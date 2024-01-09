@@ -250,6 +250,7 @@ func (lc Lifecycle) Validate() error {
 }
 
 // FilterRules returns the rules filtered by the status, prefix and tags
+// 过滤处理前缀匹配的对象的rule
 func (lc Lifecycle) FilterRules(obj ObjectOpts) []Rule {
 	if obj.Name == "" {
 		return nil

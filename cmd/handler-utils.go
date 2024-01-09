@@ -282,6 +282,7 @@ func collectInternodeStats(f http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+// 所有http请求都会统计指标，这个指标在内存中保留。如果故障是不是有一段时间的指标异常。
 func collectAPIStats(api string, f http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		resource, err := getResource(r.URL.Path, r.Host, globalDomainNames)
@@ -307,6 +308,7 @@ func collectAPIStats(api string, f http.HandlerFunc) http.HandlerFunc {
 
 		f.ServeHTTP(w, r)
 
+		// 这里记录了每个请求的流量
 		tc, ok := r.Context().Value(mcontext.ContextTraceKey).(*mcontext.TraceCtxt)
 		if !ok {
 			return

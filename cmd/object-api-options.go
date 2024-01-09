@@ -73,6 +73,7 @@ func getDefaultOpts(header http.Header, copySource bool, metadata map[string]str
 	if _, ok := header[xhttp.MinIOSourceReplicationRequest]; ok {
 		opts.ReplicationRequest = true
 	}
+	// 做测试钩子函数
 	opts.Speedtest = header.Get(globalObjectPerfUserMetadata) != ""
 	return
 }

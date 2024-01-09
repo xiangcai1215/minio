@@ -79,6 +79,7 @@ func (m *metacache) finished() bool {
 }
 
 // worthKeeping indicates if the cache by itself is worth keeping.
+// 判断是否值得保留
 func (m *metacache) worthKeeping() bool {
 	if m == nil {
 		return false

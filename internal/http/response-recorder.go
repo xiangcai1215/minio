@@ -31,7 +31,7 @@ type ResponseRecorder struct {
 	http.ResponseWriter
 	StatusCode int
 	// Log body of 4xx or 5xx responses
-	LogErrBody bool
+	LogErrBody bool // 如果打开审计日志，出现错误时候记录body
 	// Log body of all responses
 	LogAllBody bool
 

@@ -613,6 +613,7 @@ func (f *folderScanner) scanFolder(ctx context.Context, folder cachedFolder, int
 			// Check if we should skip scanning folder...
 			// We can only skip if we are not indexing into a compacted destination
 			// and the entry itself is compacted.
+			//每次扫描会记录一个版本号，特定文件只有多个周期才能扫描
 			if !into.Compacted && f.oldCache.isCompacted(h) {
 				if !h.mod(f.oldCache.Info.NextCycle, dataUsageUpdateDirCycles) {
 					// Transfer and add as child...
@@ -1015,6 +1016,7 @@ func (i *scannerItem) applyNewerNoncurrentVersionLimit(ctx context.Context, _ Ob
 		return objectInfos, nil
 	}
 
+	//处理lifecycle相关
 	event := i.lifeCycle.NoncurrentVersionsExpirationLimit(lifecycle.ObjectOpts{Name: i.objectPath()})
 	lim := event.NewerNoncurrentVersions
 	if lim == 0 || len(fivs) <= lim+1 { // fewer than lim _noncurrent_ versions

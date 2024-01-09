@@ -33,10 +33,12 @@ import (
 	"github.com/minio/minio/internal/mcontext"
 )
 
+// 配置协议层的api，
 type apiConfig struct {
 	mu sync.RWMutex
 
 	requestsDeadline time.Duration
+	// 不配置，表示没有流控
 	requestsPool     chan struct{}
 	clusterDeadline  time.Duration
 	listQuorum       string
@@ -278,10 +280,12 @@ func (t *apiConfig) getRequestsPool() (chan struct{}, time.Duration) {
 }
 
 // maxClients throttles the S3 API calls
+// 限制请求的连接数目
 func maxClients(f http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		globalHTTPStats.incS3RequestsIncoming()
 
+		// 性能测试函数
 		if r.Header.Get(globalObjectPerfUserMetadata) == "" {
 			if val := globalServiceFreeze.Load(); val != nil {
 				if unlock, ok := val.(chan struct{}); ok && unlock != nil {
@@ -296,6 +300,7 @@ func maxClients(f http.HandlerFunc) http.HandlerFunc {
 			}
 		}
 
+		// 初始化一个chan，定义了chan的cap，如果chan满了，就会阻塞
 		pool, deadline := globalAPIConfig.getRequestsPool()
 		if pool == nil {
 			f.ServeHTTP(w, r)
@@ -304,6 +309,7 @@ func maxClients(f http.HandlerFunc) http.HandlerFunc {
 
 		globalHTTPStats.addRequestsInQueue(1)
 
+		// trace content，做记录用的
 		if tc, ok := r.Context().Value(mcontext.ContextTraceKey).(*mcontext.TraceCtxt); ok {
 			tc.FuncName = "s3.MaxClients"
 		}

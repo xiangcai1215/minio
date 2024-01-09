@@ -35,6 +35,7 @@ type Monitor struct {
 	tlock sync.RWMutex // mutex for bucket throttling
 	mlock sync.RWMutex // mutex for bucket measurement
 
+	// 每个bucket有个流控的throttle和用于指标统计的measurement
 	bucketsThrottle    map[BucketOptions]*bucketThrottle
 	bucketsMeasurement map[BucketOptions]*bucketMeasurement // Buckets with objects in flight
 

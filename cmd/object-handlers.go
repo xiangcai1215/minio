@@ -562,6 +562,7 @@ func (api objectAPIHandlers) getObjectHandler(ctx context.Context, objectAPI Obj
 // This implementation of the GET operation retrieves object. To use GET,
 // you must have READ access to the object.
 func (api objectAPIHandlers) GetObjectHandler(w http.ResponseWriter, r *http.Request) {
+	// ctx 	里面记录所有的请求数据，defer里面从ctx获取请求信息，然后生成审计日志。
 	ctx := newContext(r, w, "GetObject")
 
 	defer logger.AuditLog(ctx, w, r, mustGetClaimsFromToken(r))
@@ -1546,7 +1547,7 @@ func (api objectAPIHandlers) CopyObjectHandler(w http.ResponseWriter, r *http.Re
 // Currently these keys are:
 //   - X-Amz-Server-Side-Encryption-Customer-Key
 //   - X-Amz-Copy-Source-Server-Side-Encryption-Customer-Key
-func (api objectAPIHandlers) PutObjectHandler(w http.ResponseWriter, r *http.Request) {
+func (api objectAPIHandlers) HandPutObjectHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := newContext(r, w, "PutObject")
 	defer logger.AuditLog(ctx, w, r, mustGetClaimsFromToken(r))
 
@@ -1729,6 +1730,7 @@ func (api objectAPIHandlers) PutObjectHandler(w http.ResponseWriter, r *http.Req
 	}
 	var hashReader *hash.Reader
 	// Optimization: If SSE-KMS and SSE-C did not request Content-Md5. Use uuid as etag
+	// 教育对象的md5值
 	if !etag.ContentMD5Requested(r.Header) && (crypto.S3KMS.IsRequested(r.Header) || crypto.SSEC.IsRequested(r.Header)) {
 		hashReader, err = hash.NewReaderWithOpts(ctx, reader, hash.Options{
 			Size:       size,
@@ -1848,9 +1850,11 @@ func (api objectAPIHandlers) PutObjectHandler(w http.ResponseWriter, r *http.Req
 	// Ensure that metadata does not contain sensitive information
 	crypto.RemoveSensitiveEntries(metadata)
 
+	// 肯定会走到这里，因为
 	os := newObjSweeper(bucket, object).WithVersioning(opts.Versioned, opts.VersionSuspended)
 	if !globalTierConfigMgr.Empty() {
 		// Get appropriate object info to identify the remote object to delete
+		// goiOpts里面有对象的versionID，如果处于suspended状态，这里version会设置NUlL
 		goiOpts := os.GetOpts()
 		if goi, gerr := getObjectInfo(ctx, bucket, object, goiOpts); gerr == nil {
 			os.SetTransitionState(goi.TransitionedObject)
@@ -1896,6 +1900,8 @@ func (api objectAPIHandlers) PutObjectHandler(w http.ResponseWriter, r *http.Req
 			}
 		}
 	}
+
+	// 如果有复制的需求，就开启数据复制
 	if dsc := mustReplicate(ctx, bucket, object, getMustReplicateOptions(metadata, "", "", replication.ObjectReplicationType, opts)); dsc.ReplicateAny() {
 		scheduleReplication(ctx, objInfo, objectAPI, dsc, replication.ObjectReplicationType)
 	}

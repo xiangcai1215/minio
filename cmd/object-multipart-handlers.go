@@ -735,6 +735,7 @@ func (api objectAPIHandlers) PutObjectPartHandler(w http.ResponseWriter, r *http
 		return
 	}
 
+	// 这里的reader，可以替换成为limitReader，限制读取的大小
 	pReader := NewPutObjReader(hashReader)
 
 	_, isEncrypted := crypto.IsEncrypted(mi.UserDefined)
@@ -877,7 +878,7 @@ func (api objectAPIHandlers) CompleteMultipartUploadHandler(w http.ResponseWrite
 		return
 	}
 
-	// Get upload id.
+	// Get upload id. 这个函数没有看出来给分配上传使用的
 	uploadID, _, _, _, s3Error := getObjectResources(r.Form)
 	if s3Error != ErrNone {
 		writeErrorResponse(ctx, w, errorCodes.ToAPIErr(s3Error), r.URL)
@@ -900,6 +901,7 @@ func (api objectAPIHandlers) CompleteMultipartUploadHandler(w http.ResponseWrite
 		return
 	}
 
+	// 必须保证每个分片有序。
 	if !sort.SliceIsSorted(complMultipartUpload.Parts, func(i, j int) bool {
 		return complMultipartUpload.Parts[i].PartNumber < complMultipartUpload.Parts[j].PartNumber
 	}) {
@@ -932,6 +934,7 @@ func (api objectAPIHandlers) CompleteMultipartUploadHandler(w http.ResponseWrite
 		}
 	}
 
+	// 这里生成统一的处理函数，可以把bucket的元数据和object的元数据都传递进去
 	opts, err := completeMultipartOpts(ctx, r, bucket, object)
 	if err != nil {
 		writeErrorResponse(ctx, w, toAPIError(ctx, err), r.URL)

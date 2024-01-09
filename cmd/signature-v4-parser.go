@@ -49,6 +49,7 @@ func (c credentialHeader) getScope() string {
 	}, SlashSeparator)
 }
 
+// 如果从一个请求中，判断是不是这个资源的owner呢
 func getReqAccessKeyV4(r *http.Request, region string, stype serviceType) (auth.Credentials, bool, APIErrorCode) {
 	ch, s3Err := parseCredentialHeader("Credential="+r.Form.Get(xhttp.AmzCredential), region, stype)
 	if s3Err != ErrNone {

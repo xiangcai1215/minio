@@ -17,6 +17,7 @@
 
 package cmd
 
+// 跨区域复制相关实现，bucket的bandwidth主要为力这个流控的实现
 import (
 	"context"
 	"encoding/binary"
@@ -961,6 +962,7 @@ func getReplicationAction(oi1 ObjectInfo, oi2 minio.ObjectInfo, opType replicati
 
 // replicateObject replicates the specified version of the object to destination bucket
 // The source object is then updated to reflect the replication status.
+// 复制对象，
 func replicateObject(ctx context.Context, ri ReplicateObjectInfo, objectAPI ObjectLayer) {
 	var replicationStatus replication.StatusType
 	defer func() {
@@ -2262,6 +2264,7 @@ func proxyHeadToReplicationTarget(ctx context.Context, bucket, object string, rs
 	return oi, proxy
 }
 
+// 开始复制数据，
 func scheduleReplication(ctx context.Context, oi ObjectInfo, o ObjectLayer, dsc ReplicateDecision, opType replication.Type) {
 	tgtStatuses := replicationStatusesMap(oi.ReplicationStatusInternal)
 	purgeStatuses := versionPurgeStatusesMap(oi.VersionPurgeStatusInternal)

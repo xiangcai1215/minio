@@ -147,6 +147,7 @@ var (
 	}
 )
 
+// 所有请求抽象的配置文件，可以是请求协议层，也是协议层请求底层的配置，这是统一的抽象。
 // Config storage class configuration
 type Config struct {
 	RequestsMax                 int           `json:"requests_max"`

@@ -156,6 +156,7 @@ func getRequestAuthType(r *http.Request) (at authType) {
 	return authTypeUnknown
 }
 
+// admin请求的签名，
 func validateAdminSignature(ctx context.Context, r *http.Request, region string) (auth.Credentials, bool, APIErrorCode) {
 	var cred auth.Credentials
 	var owner bool
@@ -186,10 +187,12 @@ func validateAdminSignature(ctx context.Context, r *http.Request, region string)
 // request. It only accepts V2 and V4 requests. Presigned, JWT and anonymous requests
 // are automatically rejected.
 func checkAdminRequestAuth(ctx context.Context, r *http.Request, action policy.AdminAction, region string) (auth.Credentials, APIErrorCode) {
+	// 验证身份
 	cred, owner, s3Err := validateAdminSignature(ctx, r, region)
 	if s3Err != ErrNone {
 		return cred, s3Err
 	}
+	// 验证请求，action是否匹配
 	if globalIAMSys.IsAllowed(policy.Args{
 		AccountName:     cred.AccessKey,
 		Groups:          cred.Groups,
@@ -317,6 +320,8 @@ func checkClaimsFromToken(r *http.Request, cred auth.Credentials) (map[string]in
 //     for authenticated requests validates IAM policies.
 //
 // returns APIErrorCode if any to be replied to the client.
+
+// 根据用户的action，对请求做认证鉴权，里面有两个部分
 func checkRequestAuthType(ctx context.Context, r *http.Request, action policy.Action, bucketName, objectName string) (s3Err APIErrorCode) {
 	logger.GetReqInfo(ctx).BucketName = bucketName
 	logger.GetReqInfo(ctx).ObjectName = objectName
@@ -358,6 +363,7 @@ func authenticateRequest(ctx context.Context, r *http.Request, action policy.Act
 		case policy.GetBucketLocationAction, policy.ListAllMyBucketsAction:
 			region = ""
 		}
+		// 验证身份和签名，都是从请求里面获取
 		if s3Err = isReqAuthenticated(ctx, r, region, serviceS3); s3Err != ErrNone {
 			return s3Err
 		}
@@ -368,6 +374,7 @@ func authenticateRequest(ctx context.Context, r *http.Request, action policy.Act
 	}
 
 	logger.GetReqInfo(ctx).Cred = cred
+	// 这个owner是通过IAM系统来判断的。
 	logger.GetReqInfo(ctx).Owner = owner
 	logger.GetReqInfo(ctx).Region = globalSite.Region
 
@@ -403,6 +410,7 @@ func authorizeRequest(ctx context.Context, r *http.Request, action policy.Action
 		return ErrAccessDenied
 	}
 
+	// 从请求获取所有参数，包括owner和buckey等信息，
 	cred := reqInfo.Cred
 	owner := reqInfo.Owner
 	region := reqInfo.Region
@@ -444,6 +452,7 @@ func authorizeRequest(ctx context.Context, r *http.Request, action policy.Action
 
 		return ErrAccessDenied
 	}
+	// 删除对象特定版本和删除对象的policy不一样，需要分开校验
 	if action == policy.DeleteObjectAction && versionID != "" {
 		if !globalIAMSys.IsAllowed(policy.Args{
 			AccountName:     cred.AccessKey,
@@ -459,6 +468,7 @@ func authorizeRequest(ctx context.Context, r *http.Request, action policy.Action
 			return ErrAccessDenied
 		}
 	}
+	// 这里是对IAM系统的policy进行校验，上面globalPolicySys是对bucket的policy进行校验
 	if globalIAMSys.IsAllowed(policy.Args{
 		AccountName:     cred.AccessKey,
 		Groups:          cred.Groups,
@@ -502,14 +512,17 @@ func authorizeRequest(ctx context.Context, r *http.Request, action policy.Action
 // returns APIErrorCode if any to be replied to the client.
 // Additionally returns the accessKey used in the request, and if this request is by an admin.
 func checkRequestAuthTypeCredential(ctx context.Context, r *http.Request, action policy.Action) (cred auth.Credentials, owner bool, s3Err APIErrorCode) {
-	s3Err = authenticateRequest(ctx, r, action)
+	// 先认证，再鉴权，认证
+	// IAM完成认证，bucket policy完成鉴权
+	s3Err = authenticateRequest(ctx, r, action) // 从请求参数获取用户身份信息，同时解析处理user和ak
+
 	reqInfo := logger.GetReqInfo(ctx)
 	if reqInfo == nil {
 		return cred, owner, ErrAccessDenied
 	}
 
 	cred = reqInfo.Cred
-	owner = reqInfo.Owner
+	owner = reqInfo.Owner // 这个owner是怎么得到的
 	if s3Err != ErrNone {
 		return cred, owner, s3Err
 	}
@@ -594,12 +607,15 @@ func isSupportedS3AuthType(aType authType) bool {
 	return ok
 }
 
+// 为什么要在身份认证里面嵌入一个对授权header的校验，因为前面middlerware嵌入的特殊字段，防止SST攻击。
+// auditlog 是defer log形式嵌入到authMiddler里面
 // setAuthMiddleware to validate authorization header for the incoming request.
 func setAuthMiddleware(h http.Handler) http.Handler {
 	// handler for validating incoming authorization headers.
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tc, ok := r.Context().Value(mcontext.ContextTraceKey).(*mcontext.TraceCtxt)
 
+		//判断签名的时间是否合法
 		aType := getRequestAuthType(r)
 		switch aType {
 		case authTypeSigned, authTypeSignedV2, authTypeStreamingSigned, authTypeStreamingSignedTrailer:
@@ -724,6 +740,8 @@ func isPutRetentionAllowed(bucketName, objectName string, retDays int, retDate t
 	return ErrAccessDenied
 }
 
+//	根据请求生成一个policy，在去IAM系统里面判断是否有操作权限。
+//
 // isPutActionAllowed - check if PUT operation is allowed on the resource, this
 // call verifies bucket policies and IAM policies, supports multi user
 // checks etc.
@@ -756,6 +774,7 @@ func isPutActionAllowed(ctx context.Context, atype authType, bucketName, objectN
 		return ErrNone
 	}
 
+	// bucket policy管理的系统，如果是匿名访问，就需要这个权限盘判断
 	if cred.AccessKey == "" {
 		if globalPolicySys.IsAllowed(policy.BucketPolicyArgs{
 			AccountName:     cred.AccessKey,
@@ -770,7 +789,7 @@ func isPutActionAllowed(ctx context.Context, atype authType, bucketName, objectN
 		}
 		return ErrAccessDenied
 	}
-
+	// IAM 系统 policy 管理的事情
 	if globalIAMSys.IsAllowed(policy.Args{
 		AccountName:     cred.AccessKey,
 		Groups:          cred.Groups,

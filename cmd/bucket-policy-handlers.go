@@ -169,8 +169,10 @@ func (api objectAPIHandlers) DeleteBucketPolicyHandler(w http.ResponseWriter, r 
 
 // GetBucketPolicyHandler - This HTTP handler returns bucket policy configuration.
 func (api objectAPIHandlers) GetBucketPolicyHandler(w http.ResponseWriter, r *http.Request) {
+	// 用户的运行日志，用reqInfo记录，
 	ctx := newContext(r, w, "GetBucketPolicy")
 
+	// 这里是用户运行日志，会send都kafka或者其他平台。
 	defer logger.AuditLog(ctx, w, r, mustGetClaimsFromToken(r))
 
 	objAPI := api.ObjectAPI()

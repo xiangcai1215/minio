@@ -806,7 +806,10 @@ func updateReqContext(ctx context.Context, objects ...ObjectV) context.Context {
 	return ctx
 }
 
+// 这个函数，会根据request、response、api生成一个context
 // Returns context with ReqInfo details set in the context.
+// 而且这里的这个request的ctx，以及记录了tc，因为前面的middlerware以及记录，并且api注册时候，也增加requstBody信息
+
 func newContext(r *http.Request, w http.ResponseWriter, api string) context.Context {
 	reqID := w.Header().Get(xhttp.AmzRequestID)
 
@@ -825,6 +828,7 @@ func newContext(r *http.Request, w http.ResponseWriter, api string) context.Cont
 		VersionID:    strings.TrimSpace(r.Form.Get(xhttp.VersionID)),
 	}
 
+	// 这里是将用户的运行日志，记录到context里面
 	return logger.SetReqInfo(r.Context(), reqInfo)
 }
 

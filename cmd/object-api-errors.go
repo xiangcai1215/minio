@@ -722,7 +722,7 @@ func isErrMethodNotAllowed(err error) bool {
 	return errors.As(err, &methodNotAllowed)
 }
 
-func isErrInvalidRange(err error) bool {
+func isErrInvalidRcompleange(err error) bool {
 	_, ok := err.(InvalidRange)
 	return ok
 }

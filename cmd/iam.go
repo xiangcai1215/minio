@@ -275,7 +275,7 @@ func (sys *IAMSys) Init(ctx context.Context, objAPI ObjectLayer, etcdClient *etc
 	sys.OpenIDConfig = openidConfig
 	sys.STSTLSConfig = stsTLSConfig
 
-	sys.iamRefreshInterval = iamRefreshInterval
+	sys.iamRefreshInterval = iamRefreshInterval // 默认10分钟
 
 	// Initialize IAM store
 	sys.initStore(objAPI, etcdClient)
@@ -324,6 +324,7 @@ func (sys *IAMSys) Init(ctx context.Context, objAPI ObjectLayer, etcdClient *etc
 	// Load RoleARNs
 	sys.rolesMap = make(map[arn.ARN]string)
 
+	// 初始化获取所有ARN的权限。保存在roles里面
 	// From OpenID
 	if riMap := sys.OpenIDConfig.GetRoleInfo(); riMap != nil {
 		sys.validateAndAddRolePolicyMappings(ctx, riMap)
@@ -804,6 +805,8 @@ func (sys *IAMSys) QueryLDAPPolicyEntities(ctx context.Context, q madmin.PolicyE
 	}
 }
 
+// 怎么判断是不是临时用户，通过STS方式，
+// 首先获取user信息，
 // IsTempUser - returns if given key is a temporary user and parent user.
 func (sys *IAMSys) IsTempUser(name string) (bool, string, error) {
 	if !sys.Initialized() {
@@ -929,6 +932,7 @@ type newServiceAccountOpts struct {
 	claims map[string]interface{}
 }
 
+// 一般在管控平台里面用，admin接口实现。生成credentials，可能是临时用户。
 // NewServiceAccount - create a new service account
 func (sys *IAMSys) NewServiceAccount(ctx context.Context, parentUser string, groups []string, opts newServiceAccountOpts) (auth.Credentials, time.Time, error) {
 	if !sys.Initialized() {
@@ -982,6 +986,7 @@ func (sys *IAMSys) NewServiceAccount(ctx context.Context, parentUser string, gro
 
 	var accessKey, secretKey string
 	var err error
+	// 新创建一个用户，如果自带ak和sk，使用自带的，否则生成一个新的。
 	if len(opts.accessKey) > 0 {
 		accessKey, secretKey = opts.accessKey, opts.secretKey
 	} else {
@@ -1419,6 +1424,7 @@ func (sys *IAMSys) updateGroupMembershipsForLDAP(ctx context.Context) {
 	}
 }
 
+// 根据用户的ak获取用户凭证，
 // GetUser - get user credentials
 func (sys *IAMSys) GetUser(ctx context.Context, accessKey string) (u UserIdentity, ok bool) {
 	if !sys.Initialized() {
@@ -1437,6 +1443,7 @@ func (sys *IAMSys) GetUser(ctx context.Context, accessKey string) (u UserIdentit
 		loadUserCalled = true
 	}
 
+	// 如果从缓存没有获取到，就从后台获取。这里IAM、bucket POlicy都可以实现
 	u, ok = sys.store.GetUser(accessKey)
 	if !ok && !loadUserCalled {
 		sys.store.LoadUser(ctx, accessKey)
@@ -1695,6 +1702,7 @@ func (sys *IAMSys) PolicyDBUpdateLDAP(ctx context.Context, isAttach bool,
 			}
 		}
 	}
+	//如果policy修改后，会通知所有的站点复制策略。
 
 	logger.LogIf(ctx, globalSiteReplicationSys.IAMChangeHook(ctx, madmin.SRIAMItem{
 		Type: madmin.SRIAMItemPolicyMapping,
@@ -1977,6 +1985,7 @@ func (sys *IAMSys) GetCombinedPolicy(policies ...string) policy.Policy {
 }
 
 // IsAllowed - checks given policy args is allowed to continue the Rest API.
+// IAMSys的rolesMap记录所有ARN的权限，这个ARN当然可以是用户资源，也可以是S3的bucket资源。
 func (sys *IAMSys) IsAllowed(args policy.Args) bool {
 	// If opa is configured, use OPA always.
 	if authz := newGlobalAuthZPluginFn(); authz != nil {
@@ -2022,6 +2031,7 @@ func (sys *IAMSys) IsAllowed(args policy.Args) bool {
 	}
 
 	// Policies were found, evaluate all of them.
+	// policy是否匹配
 	return sys.GetCombinedPolicy(policies...).IsAllowed(args)
 }
 

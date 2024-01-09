@@ -28,6 +28,7 @@ const (
 	betaBucket = 0.1 // Number of averages considered = 1/(1-betaObject)
 )
 
+// 会统计每个bucket美妙的带宽流量
 // bucketMeasurement captures the bandwidth details for one bucket
 type bucketMeasurement struct {
 	lock                 sync.Mutex

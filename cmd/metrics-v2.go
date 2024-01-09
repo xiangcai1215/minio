@@ -95,10 +95,11 @@ func init() {
 
 	bucketMetricsGroups := []*MetricsGroup{
 		getBucketUsageMetrics(),
+		// 获取bucket的http请求指标
 		getHTTPMetrics(true),
 		getBucketTTFBMetric(),
 	}
-
+	// 获取所有的指标，指标统计到group中。每个指标的metric不一样。
 	bucketPeerMetricsGroups = []*MetricsGroup{
 		getHTTPMetrics(true),
 		getBucketTTFBMetric(),
@@ -276,6 +277,8 @@ const (
 
 // MetricType for the types of metrics supported
 type MetricType string
+
+// gauge是可变数据，
 
 const (
 	gaugeMetric     = "gaugeMetric"
@@ -1316,6 +1319,7 @@ func getS3TTFBDistributionMD() MetricDescription {
 	}
 }
 
+// 这个看情况是不是要提供，可以后续优化，提供每个bucket的访问时延
 func getBucketTTFBDistributionMD() MetricDescription {
 	return MetricDescription{
 		Namespace: bucketMetricNamespace,
@@ -1386,6 +1390,7 @@ func getMinioProcessIOReadCachedBytesMD() MetricDescription {
 	}
 }
 
+// 记录经常的系统调用指标
 func getMinIOProcessSysCallRMD() MetricDescription {
 	return MetricDescription{
 		Namespace: nodeMetricNamespace,
@@ -2563,6 +2568,7 @@ func getHTTPMetrics(bucketOnly bool) *MetricsGroup {
 	mg := &MetricsGroup{
 		cacheInterval: 10 * time.Second,
 	}
+	// 这个是一个注册函数，定义指标的过期时间和过期应该如何更新数据。
 	mg.RegisterRead(func(ctx context.Context) (metrics []Metric) {
 		if !bucketOnly {
 			httpStats := globalHTTPStats.toServerHTTPStats()
@@ -3448,6 +3454,7 @@ func getKMSMetrics() *MetricsGroup {
 	return mg
 }
 
+// 使用ippeline方式，将数据上报到prometheus
 func collectMetric(metric Metric, labels []string, values []string, metricName string, out chan<- prometheus.Metric) {
 	if metric.Description.Type == histogramMetric {
 		if metric.Histogram == nil {
@@ -3533,6 +3540,7 @@ func (c *minioBucketCollector) Collect(out chan<- prometheus.Metric) {
 
 	// Call peer api to fetch metrics
 	wg.Add(2)
+	//
 	go publish(ReportMetrics(GlobalContext, c.metricsGroups))
 	go publish(globalNotificationSys.GetBucketMetrics(GlobalContext))
 	wg.Wait()
@@ -3574,6 +3582,7 @@ func (c *minioClusterCollector) Collect(out chan<- prometheus.Metric) {
 }
 
 // ReportMetrics reports serialized metrics to the channel passed for the metrics generated.
+// 生成需要上报的指标，通过chan返回。
 func ReportMetrics(ctx context.Context, metricsGroups []*MetricsGroup) <-chan Metric {
 	ch := make(chan Metric)
 	go func() {

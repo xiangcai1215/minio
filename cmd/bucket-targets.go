@@ -369,6 +369,7 @@ func (sys *BucketTargetSys) SetTarget(ctx context.Context, bucket string, tgt *m
 	return nil
 }
 
+// 设置bucket的总体带宽，这个带宽会按照节点数目平均分配到每个节点上
 func (sys *BucketTargetSys) updateBandwidthLimit(bucket, arn string, limit int64) {
 	if limit == 0 {
 		globalBucketMonitor.DeleteBucketThrottle(bucket, arn)

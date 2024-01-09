@@ -65,6 +65,8 @@ func getOpName(name string) (op string) {
 
 // If trace is enabled, execute the request if it is traced by other handlers
 // otherwise, generate a trace event with request information but no response.
+// 记录每个请求的记录，所以初始化时候生成请求消息和返回消息。
+// 后面完成后，
 func httpTracerMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Setup a http request response recorder - this is needed for
@@ -82,9 +84,12 @@ func httpTracerMiddleware(h http.Handler) http.Handler {
 			ResponseRecorder: respRecorder,
 		}
 
+		// 把tc作为一个ctx传入到request 中.因为这是第一个middler
+		// 所以这个tc会跟随r请求，后面在metric和审计日志的地方会读出去。
 		r = r.WithContext(context.WithValue(r.Context(), mcontext.ContextTraceKey, &tc))
 
 		reqStartTime := time.Now().UTC()
+		// 也要等待请求处理完成，如果要记录审计日志，也需要这样。
 		h.ServeHTTP(respRecorder, r)
 		reqEndTime := time.Now().UTC()
 
@@ -171,6 +176,9 @@ func httpTracerMiddleware(h http.Handler) http.Handler {
 	})
 }
 
+// 每个路由注册方法的时候，都会调用这个函数，确定函数名字，以及这个请求是否需要记录body
+// 前面traceMiddler地方，会设置tc，所以这里从全局ctx里面能够获取到。建议审计日志的记录就在trace的订阅哪里实现
+// 这个没有记录tc，则直接返回。指针类型，这里修改，前面会同步修改。
 func httpTrace(f http.HandlerFunc, logBody bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tc, ok := r.Context().Value(mcontext.ContextTraceKey).(*mcontext.TraceCtxt)

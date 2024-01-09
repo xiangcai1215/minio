@@ -18,7 +18,7 @@ A default retention period and retention mode can be configured on a bucket to b
 WORM on a bucket is enabled by setting object lock configuration. This configuration is applied to all the objects in the bucket. Below is an example to set `Governance` mode and one day retention time on `mybucket`.
 
 ```sh
-awscli s3api put-object-lock-configuration --bucket mybucket --object-lock-configuration 'ObjectLockEnabled=\"Enabled\",Rule={DefaultRetention={Mode=\"GOVERNANCE\",Days=1}}'
+awscli s3server put-object-lock-configuration --bucket mybucket --object-lock-configuration 'ObjectLockEnabled=\"Enabled\",Rule={DefaultRetention={Mode=\"GOVERNANCE\",Days=1}}'
 ```
 
 ### Set object lock
@@ -26,7 +26,7 @@ awscli s3api put-object-lock-configuration --bucket mybucket --object-lock-confi
 PutObject API allows setting per object retention mode and retention duration using `x-amz-object-lock-mode` and `x-amz-object-lock-retain-until-date` headers. This takes precedence over any bucket object lock configuration w.r.t retention.
 
 ```sh
-aws s3api put-object --bucket testbucket --key lockme --object-lock-mode GOVERNANCE --object-lock-retain-until-date "2019-11-20"  --body /etc/issue
+aws s3server put-object --bucket testbucket --key lockme --object-lock-mode GOVERNANCE --object-lock-retain-until-date "2019-11-20"  --body /etc/issue
 ```
 
 See <https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lock-overview.html> for AWS S3 spec on object locking and permissions required for object retention and governance bypass overrides.
@@ -36,7 +36,7 @@ See <https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lock-overview.html> 
 PutObject API allows setting legal hold using `x-amz-object-lock-legal-hold` header.
 
 ```sh
-aws s3api put-object --bucket testbucket --key legalhold --object-lock-legal-hold-status ON --body /etc/issue
+aws s3server put-object --bucket testbucket --key legalhold --object-lock-legal-hold-status ON --body /etc/issue
 ```
 
 See <https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lock-overview.html> for AWS S3 spec on object locking and permissions required for specifying legal hold.

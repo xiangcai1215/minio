@@ -921,6 +921,7 @@ func serverMain(ctx *cli.Context) {
 		logger.FatalIf(err, "Unable to initialize MinIO client")
 	})
 
+	// 这里也是主动收集指标，不是在http的router中间
 	go bootstrapTrace("startResourceMetricsCollection", func() {
 		startResourceMetricsCollection()
 	})
