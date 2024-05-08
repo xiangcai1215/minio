@@ -37,7 +37,7 @@ const (
 	AmzFwdHeaderChecksumSha1       = "x-amz-fwd-header-x-amz-checksum-sha1"
 	AmzFwdHeaderChecksumSha256     = "x-amz-fwd-header-x-amz-checksum-sha256"
 	AmzFwdHeaderDeleteMarker       = "x-amz-fwd-header-x-amz-delete-marker"
-	AmzFwdHeaderETag               = "x-amz-fwd-header-ETag"
+	AmzFwdHeaderETag               = "x-amz-fwd-header-Etag"
 	AmzFwdHeaderExpires            = "x-amz-fwd-header-Expires"
 	AmzFwdHeaderExpiration         = "x-amz-fwd-header-x-amz-expiration"
 	AmzFwdHeaderLastModified       = "x-amz-fwd-header-Last-Modified"

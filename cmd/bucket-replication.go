@@ -69,7 +69,7 @@ const (
 	ReplicaTimestamp = "replica-timestamp"
 	// TaggingTimestamp - the last time a tag metadata modification happened on this cluster for this object version
 	TaggingTimestamp = "tagging-timestamp"
-	// ObjectLockRetentionTimestamp - the last time a object lock metadata modification happened on this cluster for this object version
+	// ObjectLockRetentionTimestamp - the last time a object lTaggingTimestampock metadata modification happened on this cluster for this object version
 	ObjectLockRetentionTimestamp = "objectlock-retention-timestamp"
 	// ObjectLockLegalHoldTimestamp - the last time a legal hold metadata modification happened on this cluster for this object version
 	ObjectLockLegalHoldTimestamp = "objectlock-legalhold-timestamp"
@@ -1407,7 +1407,7 @@ func (ri ReplicateObjectInfo) replicateAll(ctx context.Context, objectAPI Object
 				})
 			}
 			// object with same VersionID already exists, replication kicked off by
-			// PutObject might have completed
+			// PutObjectMeta might have completed
 			if objInfo.TargetReplicationStatus(tgt.ARN) == replication.Pending ||
 				objInfo.TargetReplicationStatus(tgt.ARN) == replication.Failed ||
 				ri.OpType == replication.ExistingObjectReplicationType {
@@ -2135,7 +2135,7 @@ func proxyGetToReplicationTarget(ctx context.Context, bucket, object string, rs 
 		}
 		gopts.Set(xhttp.Range, h)
 	}
-	// Make sure to match ETag when proxying.
+	// Make sure to match Etag when proxying.
 	if err = gopts.SetMatchETag(oi.ETag); err != nil {
 		return nil, proxy, err
 	}
@@ -3090,7 +3090,7 @@ func queueReplicationHeal(ctx context.Context, bucket string, oi ObjectInfo, rcf
 			globalReplicationPool.queueReplicaDeleteTask(dv)
 			return
 		}
-		// if replication status is Complete on DeleteMarker and existing object resync required
+		// if replication status is Complete on IsDeleteMarker and existing object resync required
 		if roi.ExistingObjResync.mustResync() && (roi.ReplicationStatus == replication.Completed || roi.ReplicationStatus.Empty()) {
 			queueReplicateDeletesWrapper(dv, roi.ExistingObjResync)
 			return

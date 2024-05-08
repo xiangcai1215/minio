@@ -569,10 +569,10 @@ func (z *ObjectPartInfo) DecodeMsg(dc *msgp.Reader) (err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
-		case "ETag":
+		case "Etag":
 			z.ETag, err = dc.ReadString()
 			if err != nil {
-				err = msgp.WrapError(err, "ETag")
+				err = msgp.WrapError(err, "Etag")
 				return
 			}
 		case "Number":
@@ -668,14 +668,14 @@ func (z *ObjectPartInfo) EncodeMsg(en *msgp.Writer) (err error) {
 	if zb0001Len == 0 {
 		return
 	}
-	// write "ETag"
+	// write "Etag"
 	err = en.Append(0xa4, 0x45, 0x54, 0x61, 0x67)
 	if err != nil {
 		return
 	}
 	err = en.WriteString(z.ETag)
 	if err != nil {
-		err = msgp.WrapError(err, "ETag")
+		err = msgp.WrapError(err, "Etag")
 		return
 	}
 	// write "Number"
@@ -777,7 +777,7 @@ func (z *ObjectPartInfo) MarshalMsg(b []byte) (o []byte, err error) {
 	if zb0001Len == 0 {
 		return
 	}
-	// string "ETag"
+	// string "Etag"
 	o = append(o, 0xa4, 0x45, 0x54, 0x61, 0x67)
 	o = msgp.AppendString(o, z.ETag)
 	// string "Number"
@@ -827,10 +827,10 @@ func (z *ObjectPartInfo) UnmarshalMsg(bts []byte) (o []byte, err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
-		case "ETag":
+		case "Etag":
 			z.ETag, bts, err = msgp.ReadStringBytes(bts)
 			if err != nil {
-				err = msgp.WrapError(err, "ETag")
+				err = msgp.WrapError(err, "Etag")
 				return
 			}
 		case "Number":

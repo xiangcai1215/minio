@@ -19,6 +19,7 @@ package init
 
 import "os"
 
+// 统一使用国际标准时间
 func init() {
 	// All MinIO operations must be under UTC.
 	os.Setenv("TZ", "UTC")

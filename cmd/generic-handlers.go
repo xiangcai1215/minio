@@ -328,6 +328,7 @@ func hasMultipleAuth(r *http.Request) bool {
 
 // requestValidityHandler validates all the incoming paths for
 // any malicious requests.
+// 请求的安全校验，也可以加上
 func setRequestValidityMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tc, ok := r.Context().Value(mcontext.ContextTraceKey).(*mcontext.TraceCtxt)
@@ -442,6 +443,8 @@ func setRequestValidityMiddleware(h http.Handler) http.Handler {
 // setBucketForwardingMiddleware middleware forwards the path style requests
 // on a bucket to the right bucket location, bucket to IP configuration
 // is obtained from centralized etcd configuration service.
+// 对于path的请求方式，最开始不知道bucket的位置，需要发送到一个集中地方做校验
+// minio的path请求方式解析是放到lim
 func setBucketForwardingMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if origin := w.Header().Get("Access-Control-Allow-Origin"); origin == "null" {
@@ -560,6 +563,7 @@ func setCriticalErrorHandler(h http.Handler) http.Handler {
 
 // setUploadForwardingMiddleware middleware forwards multiparts requests
 // in a site replication setup to peer that initiated the upload
+// 应用与站点复制，
 func setUploadForwardingMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !globalSiteReplicationSys.isEnabled() ||

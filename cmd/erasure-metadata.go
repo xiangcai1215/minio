@@ -168,6 +168,7 @@ func (fi FileInfo) ToObjectInfo(bucket, object string, versioned bool) ObjectInf
 	objInfo.backendType = BackendErasure
 
 	// Extract etag from metadata.
+	// minio的对象的etag值从file的元数据获得
 	objInfo.ETag = extractETag(fi.Metadata)
 
 	// Add user tags to the object info
@@ -268,6 +269,8 @@ func objectPartIndex(parts []ObjectPartInfo, partNumber int) int {
 }
 
 // AddObjectPart - add a new object part in order.
+// 生成对象的元数据，即使是单个对象，这里part也会有一份元数据。
+// 就是说单个对象对应单个part
 func (fi *FileInfo) AddObjectPart(partNumber int, partETag string, partSize, actualSize int64, modTime time.Time, idx []byte, checksums map[string]string) {
 	partInfo := ObjectPartInfo{
 		Number:     partNumber,
@@ -302,6 +305,7 @@ func (fi FileInfo) ObjectToPartOffset(ctx context.Context, offset int64) (partIn
 	}
 	partOffset = offset
 	// Seek until object offset maps to a particular part offset.
+	// 如果parts是空的呢
 	for i, part := range fi.Parts {
 		partIndex = i
 		// Offset is smaller than size we have reached the proper part offset.

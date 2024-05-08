@@ -77,13 +77,15 @@ type Options struct {
 
 // NewReaderWithOpts is like NewReader but takes `Options` as argument, allowing
 // callers to indicate if they want to disable md5sum checksum.
+// 在加密的时候，会把ForceMD5设置一个特殊的秘钥，
+// 另外在批量上传对象的时候，会设置DisableMD5
 func NewReaderWithOpts(ctx context.Context, src io.Reader, opts Options) (*Reader, error) {
 	// return hard limited reader
 	return newReader(ctx, src, opts.Size, opts.MD5Hex, opts.SHA256Hex, opts.ActualSize, opts.DisableMD5, opts.ForceMD5)
 }
 
 // NewReader returns a new Reader that wraps src and computes
-// MD5 checksum of everything it reads as ETag.
+// MD5 checksum of everything it reads as Etag.
 //
 // It also computes the SHA256 checksum of everything it reads
 // if sha256Hex is not the empty string.
@@ -104,7 +106,7 @@ func NewReader(ctx context.Context, src io.Reader, size int64, md5Hex, sha256Hex
 func newReader(ctx context.Context, src io.Reader, size int64, md5Hex, sha256Hex string, actualSize int64, disableMD5 bool, forceMD5 []byte) (*Reader, error) {
 	MD5, err := hex.DecodeString(md5Hex)
 	if err != nil {
-		return nil, BadDigest{ // TODO(aead): Return an error that indicates that an invalid ETag has been specified
+		return nil, BadDigest{ // TODO(aead): Return an error that indicates that an invalid Etag has been specified
 			ExpectedMD5:   md5Hex,
 			CalculatedMD5: "",
 		}
@@ -119,6 +121,7 @@ func newReader(ctx context.Context, src io.Reader, size int64, md5Hex, sha256Hex
 
 	// Merge the size, MD5 and SHA256 values if src is a Reader.
 	// The size may be set to -1 by callers if unknown.
+	// 一般初始化不会走到这里，进来后是http.body
 	if r, ok := src.(*Reader); ok {
 		if r.bytesRead > 0 {
 			return nil, errors.New("hash: already read from hash reader")
@@ -153,7 +156,9 @@ func newReader(ctx context.Context, src io.Reader, size int64, md5Hex, sha256Hex
 
 	if size >= 0 {
 		r := ioutil.HardLimitReader(src, size)
+
 		if !disableMD5 {
+			// 没有明确不用md5，就用md5,将原来的src保证一个etag类型
 			if _, ok := src.(etag.Tagger); !ok {
 				src = etag.NewReader(ctx, r, MD5, forceMD5)
 			} else {

@@ -348,6 +348,7 @@ const DirectioAlignSize = 4096
 // used with DIRECT I/O based file descriptor and it is expected that
 // input writer *os.File not a generic io.Writer. Make sure to have
 // the file opened for writes with syscall.O_DIRECT flag.
+// 这里给directIO使用，directID需要特定的操作系统和文件系统支持，例如linux和ext4和xfs等。写入需要4KB对齐
 func CopyAligned(w io.Writer, r io.Reader, alignedBuf []byte, totalSize int64, file *os.File) (int64, error) {
 	if totalSize == 0 {
 		return 0, nil

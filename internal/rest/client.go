@@ -253,6 +253,7 @@ func (c *Client) dumpHTTP(req *http.Request, resp *http.Response) {
 	// Only display response header.
 	var respTrace []byte
 
+	// dump response就是将响应的body copy一份，保存的trace文件中
 	// For errors we make sure to dump response body as well.
 	if resp.StatusCode != http.StatusOK &&
 		resp.StatusCode != http.StatusPartialContent &&

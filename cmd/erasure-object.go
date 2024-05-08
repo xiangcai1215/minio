@@ -352,6 +352,9 @@ func (er erasureObjects) getObjectWithFileInfo(ctx context.Context, bucket, obje
 
 	var healOnce sync.Once
 
+	// 计算出来本次读对象数据其实的offset位置所在的part，以及最后一个part
+	// 这里可以看到每个part是串行读的方式，可以这么考虑，因为返回给用户字节流必须要顺序
+	// 假设一万个分片，第2个分片晚一点，其余即使先到会占用大量的内存。所以这里是串行读取
 	for ; partIndex <= lastPartIndex; partIndex++ {
 		if length == totalBytesRead {
 			break
@@ -370,6 +373,7 @@ func (er erasureObjects) getObjectWithFileInfo(ctx context.Context, bucket, obje
 
 		tillOffset := erasure.ShardFileOffset(partOffset, partLength, partSize)
 		// Get the checksums of the current part.
+		// onlineDisks是这个对象所在的磁盘数据，因为是纠删码，所以可以同时开启多个磁盘读取并发
 		readers := make([]io.ReaderAt, len(onlineDisks))
 		prefer := make([]bool, len(onlineDisks))
 		for index, disk := range onlineDisks {
@@ -679,6 +683,7 @@ func readAllXL(ctx context.Context, disks []StorageAPI, bucket, object string, r
 	return metaFileInfos, errs
 }
 
+// 根据对象的元数据，这里是fileInfo，返回对象所在的磁盘列表就是onlineDisks数据
 func (er erasureObjects) getObjectFileInfo(ctx context.Context, bucket, object string, opts ObjectOptions, readData bool) (fi FileInfo, metaArr []FileInfo, onlineDisks []StorageAPI, err error) {
 	disks := er.getDisks()
 
@@ -1171,6 +1176,7 @@ func (er erasureObjects) putObject(ctx context.Context, bucket string, object st
 
 	// Initialize erasure metadata.
 	for index := range partsMetadata {
+		// 注意注意，这里每个parts的元数据value都是这个对象的文件元数据，fi
 		partsMetadata[index] = fi
 	}
 
@@ -1260,6 +1266,7 @@ func (er erasureObjects) putObject(ctx context.Context, bucket string, object st
 		}
 		logger.LogIf(ctx, err)
 	}
+	// 数据写入到各个Writer成功
 	n, erasureErr := erasure.Encode(ctx, toEncode, writers, buffer, writeQuorum)
 	closeBitrotWriters(writers)
 	if erasureErr != nil {
@@ -1302,10 +1309,14 @@ func (er erasureObjects) putObject(ctx context.Context, bucket string, object st
 			partsMetadata[i].Data = nil
 		}
 		// No need to add checksum to part. We already have it on the object.
+		// 这里就相当于，给fi生成一个part 信息。
 		partsMetadata[i].AddObjectPart(1, "", n, data.ActualSize(), modTime, compIndex, nil)
 		partsMetadata[i].Versioned = opts.Versioned || opts.VersionSuspended
 	}
 
+	// 这里计算对象的md5值，然后直接把userDefined赋值给partMetadata
+	// 就是每个对象写入存储引擎后，通过r有两个数据流，一个是原始的rawReader，这个用于计算hash值，或者其他checksum数据
+	// 另外一个负责数据读取和写入到存储引擎。
 	userDefined["etag"] = r.MD5CurrentHexString()
 	kind, _ := crypto.IsEncrypted(userDefined)
 	if opts.PreserveETag != "" {
@@ -1349,6 +1360,7 @@ func (er erasureObjects) putObject(ctx context.Context, bucket string, object st
 		return ObjectInfo{}, toObjectErr(err, bucket, object)
 	}
 
+	//  每个parts的Metadata就是文件的元数据
 	for i := 0; i < len(onlineDisks); i++ {
 		if onlineDisks[i] != nil && onlineDisks[i].IsOnline() {
 			// Object info is the same in all disks, so we can pick
@@ -1827,6 +1839,7 @@ func (er erasureObjects) addPartial(bucket, object, versionID string) {
 	})
 }
 
+// tangzhixiang set object meta
 func (er erasureObjects) PutObjectMetadata(ctx context.Context, bucket, object string, opts ObjectOptions) (ObjectInfo, error) {
 	if !opts.NoLock {
 		// Lock the object before updating metadata.

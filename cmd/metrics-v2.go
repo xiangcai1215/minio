@@ -59,10 +59,12 @@ func init() {
 	}
 
 	peerMetricsGroups = []*MetricsGroup{
+		// go gorutinue数量
 		getGoMetrics(),
 		getHTTPMetrics(false),
 		getNotificationMetrics(),
 		getLocalStorageMetrics(),
+		// 进程指标
 		getMinioProcMetrics(),
 		getMinioVersionMetrics(),
 		getNetworkMetrics(),
@@ -3542,6 +3544,7 @@ func (c *minioBucketCollector) Collect(out chan<- prometheus.Metric) {
 	wg.Add(2)
 	//
 	go publish(ReportMetrics(GlobalContext, c.metricsGroups))
+	// 这里是获取所有节点上面的Buckets监控指标，然后上报到prometheus
 	go publish(globalNotificationSys.GetBucketMetrics(GlobalContext))
 	wg.Wait()
 }

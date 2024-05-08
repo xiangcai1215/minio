@@ -29,7 +29,7 @@ import (
 )
 
 // Benchmark utility functions for ObjectLayer.PutObject().
-// Creates Object layer setup ( MakeBucket ) and then runs the PutObject benchmark.
+// Creates Object layer setup ( MakeBucket ) and then runs the PutObjectMeta benchmark.
 func runPutObjectBenchmark(b *testing.B, obj ObjectLayer, objSize int) {
 	var err error
 	// obtains random bucket name.
@@ -43,14 +43,14 @@ func runPutObjectBenchmark(b *testing.B, obj ObjectLayer, objSize int) {
 	// get text data generated for number of bytes equal to object size.
 	textData := generateBytesData(objSize)
 	// generate md5sum for the generated data.
-	// md5sum of the data to written is required as input for PutObject.
+	// md5sum of the data to written is required as input for PutObjectMeta.
 
 	md5hex := getMD5Hash(textData)
 	sha256hex := ""
 
 	// benchmark utility which helps obtain number of allocations and bytes allocated per ops.
 	b.ReportAllocs()
-	// the actual benchmark for PutObject starts here. Reset the benchmark timer.
+	// the actual benchmark for PutObjectMeta starts here. Reset the benchmark timer.
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		// insert the object.
@@ -191,7 +191,7 @@ func generateBytesData(size int) []byte {
 }
 
 // Parallel benchmark utility functions for ObjectLayer.PutObject().
-// Creates Object layer setup ( MakeBucket ) and then runs the PutObject benchmark.
+// Creates Object layer setup ( MakeBucket ) and then runs the PutObjectMeta benchmark.
 func runPutObjectBenchmarkParallel(b *testing.B, obj ObjectLayer, objSize int) {
 	// obtains random bucket name.
 	bucket := getRandomBucketName()
@@ -204,14 +204,14 @@ func runPutObjectBenchmarkParallel(b *testing.B, obj ObjectLayer, objSize int) {
 	// get text data generated for number of bytes equal to object size.
 	textData := generateBytesData(objSize)
 	// generate md5sum for the generated data.
-	// md5sum of the data to written is required as input for PutObject.
+	// md5sum of the data to written is required as input for PutObjectMeta.
 
 	md5hex := getMD5Hash(textData)
 	sha256hex := ""
 
 	// benchmark utility which helps obtain number of allocations and bytes allocated per ops.
 	b.ReportAllocs()
-	// the actual benchmark for PutObject starts here. Reset the benchmark timer.
+	// the actual benchmark for PutObjectMeta starts here. Reset the benchmark timer.
 	b.ResetTimer()
 
 	b.RunParallel(func(pb *testing.PB) {

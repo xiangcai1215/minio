@@ -411,6 +411,7 @@ func authorizeRequest(ctx context.Context, r *http.Request, action policy.Action
 	}
 
 	// 从请求获取所有参数，包括owner和buckey等信息，
+	// 如果是创建Bucket，这里Owner会是true
 	cred := reqInfo.Cred
 	owner := reqInfo.Owner
 	region := reqInfo.Region
@@ -432,6 +433,7 @@ func authorizeRequest(ctx context.Context, r *http.Request, action policy.Action
 			// Request is allowed return the appropriate access key.
 			return ErrNone
 		}
+		// 如果是ListBucketVersionsAction上面鉴权失败了，把Action变成ListBucketAction再次鉴权
 
 		if action == policy.ListBucketVersionsAction {
 			// In AWS S3 s3:ListBucket permission is same as s3:ListBucketVersions permission
@@ -452,6 +454,8 @@ func authorizeRequest(ctx context.Context, r *http.Request, action policy.Action
 
 		return ErrAccessDenied
 	}
+
+	// 下面三个都是基于IAM系统的校验。
 	// 删除对象特定版本和删除对象的policy不一样，需要分开校验
 	if action == policy.DeleteObjectAction && versionID != "" {
 		if !globalIAMSys.IsAllowed(policy.Args{
@@ -469,6 +473,8 @@ func authorizeRequest(ctx context.Context, r *http.Request, action policy.Action
 		}
 	}
 	// 这里是对IAM系统的policy进行校验，上面globalPolicySys是对bucket的policy进行校验
+	// 这里如果是ListAllMyBucketsAction，进行IAM系统验证如果失败了，会返回ErrAccessDenied
+	// 但是listbucketsHandler接口会继续校验getBucketLocationAction和listBucketActions。这个不知道为什么
 	if globalIAMSys.IsAllowed(policy.Args{
 		AccountName:     cred.AccessKey,
 		Groups:          cred.Groups,
@@ -521,8 +527,9 @@ func checkRequestAuthTypeCredential(ctx context.Context, r *http.Request, action
 		return cred, owner, ErrAccessDenied
 	}
 
+	// 认证完成后s3Err是ErrNone，并且判断了Owner和身份信息
 	cred = reqInfo.Cred
-	owner = reqInfo.Owner // 这个owner是怎么得到的
+	owner = reqInfo.Owner
 	if s3Err != ErrNone {
 		return cred, owner, s3Err
 	}

@@ -36,14 +36,14 @@ func md5Header(data []byte) map[string]string {
 	return map[string]string{"etag": getMD5Hash(data)}
 }
 
-// Wrapper for calling PutObject tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling PutObjectMeta tests for both Erasure multiple disks and single node setup.
 func TestObjectAPIPutObjectSingle(t *testing.T) {
 	ExecExtendedObjectLayerTest(t, testObjectAPIPutObject)
 }
 
-// Tests validate correctness of PutObject.
+// Tests validate correctness of PutObjectMeta.
 func testObjectAPIPutObject(obj ObjectLayer, instanceType string, t TestErrHandler) {
-	// Generating cases for which the PutObject fails.
+	// Generating cases for which the PutObjectMeta fails.
 	bucket := "minio-bucket"
 	object := "minio-object"
 
@@ -211,15 +211,15 @@ func testObjectAPIPutObject(obj ObjectLayer, instanceType string, t TestErrHandl
 	}
 }
 
-// Wrapper for calling PutObject tests for both Erasure multiple disks case
+// Wrapper for calling PutObjectMeta tests for both Erasure multiple disks case
 // when quorum is not available.
 func TestObjectAPIPutObjectDiskNotFound(t *testing.T) {
 	ExecObjectLayerDiskAlteredTest(t, testObjectAPIPutObjectDiskNotFound)
 }
 
-// Tests validate correctness of PutObject.
+// Tests validate correctness of PutObjectMeta.
 func testObjectAPIPutObjectDiskNotFound(obj ObjectLayer, instanceType string, disks []string, t *testing.T) {
-	// Generating cases for which the PutObject fails.
+	// Generating cases for which the PutObjectMeta fails.
 	bucket := "minio-bucket"
 	object := "minio-object"
 
@@ -324,14 +324,14 @@ func testObjectAPIPutObjectDiskNotFound(obj ObjectLayer, instanceType string, di
 	}
 }
 
-// Wrapper for calling PutObject tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling PutObjectMeta tests for both Erasure multiple disks and single node setup.
 func TestObjectAPIPutObjectStaleFiles(t *testing.T) {
 	ExecObjectLayerStaleFilesTest(t, testObjectAPIPutObjectStaleFiles)
 }
 
-// Tests validate correctness of PutObject.
+// Tests validate correctness of PutObjectMeta.
 func testObjectAPIPutObjectStaleFiles(obj ObjectLayer, instanceType string, disks []string, t *testing.T) {
-	// Generating cases for which the PutObject fails.
+	// Generating cases for which the PutObjectMeta fails.
 	bucket := "minio-bucket"
 	object := "minio-object"
 
@@ -369,14 +369,14 @@ func testObjectAPIPutObjectStaleFiles(obj ObjectLayer, instanceType string, disk
 	}
 }
 
-// Wrapper for calling Multipart PutObject tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling Multipart PutObjectMeta tests for both Erasure multiple disks and single node setup.
 func TestObjectAPIMultipartPutObjectStaleFiles(t *testing.T) {
 	ExecObjectLayerStaleFilesTest(t, testObjectAPIMultipartPutObjectStaleFiles)
 }
 
-// Tests validate correctness of PutObject.
+// Tests validate correctness of PutObjectMeta.
 func testObjectAPIMultipartPutObjectStaleFiles(obj ObjectLayer, instanceType string, disks []string, t *testing.T) {
-	// Generating cases for which the PutObject fails.
+	// Generating cases for which the PutObjectMeta fails.
 	bucket := "minio-bucket"
 	object := "minio-object"
 
@@ -457,158 +457,158 @@ func testObjectAPIMultipartPutObjectStaleFiles(obj ObjectLayer, instanceType str
 	}
 }
 
-// Benchmarks for ObjectLayer.PutObject().
-// The intent is to benchmark PutObject for various sizes ranging from few bytes to 100MB.
+// Benchmarks for ObjectLayer.PutObjectMeta().
+// The intent is to benchmark PutObjectMeta for various sizes ranging from few bytes to 100MB.
 // Also each of these Benchmarks are run both Erasure and FS backends.
 
-// BenchmarkPutObjectVerySmallFS - Benchmark FS.PutObject() for object size of 10 bytes.
+// BenchmarkPutObjectVerySmallFS - Benchmark FS.PutObjectMeta() for object size of 10 bytes.
 func BenchmarkPutObjectVerySmallFS(b *testing.B) {
 	benchmarkPutObject(b, "FS", 10)
 }
 
-// BenchmarkPutObjectVerySmallErasure - Benchmark Erasure.PutObject() for object size of 10 bytes.
+// BenchmarkPutObjectVerySmallErasure - Benchmark Erasure.PutObjectMeta() for object size of 10 bytes.
 func BenchmarkPutObjectVerySmallErasure(b *testing.B) {
 	benchmarkPutObject(b, "Erasure", 10)
 }
 
-// BenchmarkPutObject10KbFS - Benchmark FS.PutObject() for object size of 10KB.
+// BenchmarkPutObject10KbFS - Benchmark FS.PutObjectMeta() for object size of 10KB.
 func BenchmarkPutObject10KbFS(b *testing.B) {
 	benchmarkPutObject(b, "FS", 10*humanize.KiByte)
 }
 
-// BenchmarkPutObject10KbErasure - Benchmark Erasure.PutObject() for object size of 10KB.
+// BenchmarkPutObject10KbErasure - Benchmark Erasure.PutObjectMeta() for object size of 10KB.
 func BenchmarkPutObject10KbErasure(b *testing.B) {
 	benchmarkPutObject(b, "Erasure", 10*humanize.KiByte)
 }
 
-// BenchmarkPutObject100KbFS - Benchmark FS.PutObject() for object size of 100KB.
+// BenchmarkPutObject100KbFS - Benchmark FS.PutObjectMeta() for object size of 100KB.
 func BenchmarkPutObject100KbFS(b *testing.B) {
 	benchmarkPutObject(b, "FS", 100*humanize.KiByte)
 }
 
-// BenchmarkPutObject100KbErasure - Benchmark Erasure.PutObject() for object size of 100KB.
+// BenchmarkPutObject100KbErasure - Benchmark Erasure.PutObjectMeta() for object size of 100KB.
 func BenchmarkPutObject100KbErasure(b *testing.B) {
 	benchmarkPutObject(b, "Erasure", 100*humanize.KiByte)
 }
 
-// BenchmarkPutObject1MbFS - Benchmark FS.PutObject() for object size of 1MB.
+// BenchmarkPutObject1MbFS - Benchmark FS.PutObjectMeta() for object size of 1MB.
 func BenchmarkPutObject1MbFS(b *testing.B) {
 	benchmarkPutObject(b, "FS", 1*humanize.MiByte)
 }
 
-// BenchmarkPutObject1MbErasure - Benchmark Erasure.PutObject() for object size of 1MB.
+// BenchmarkPutObject1MbErasure - Benchmark Erasure.PutObjectMeta() for object size of 1MB.
 func BenchmarkPutObject1MbErasure(b *testing.B) {
 	benchmarkPutObject(b, "Erasure", 1*humanize.MiByte)
 }
 
-// BenchmarkPutObject5MbFS - Benchmark FS.PutObject() for object size of 5MB.
+// BenchmarkPutObject5MbFS - Benchmark FS.PutObjectMeta() for object size of 5MB.
 func BenchmarkPutObject5MbFS(b *testing.B) {
 	benchmarkPutObject(b, "FS", 5*humanize.MiByte)
 }
 
-// BenchmarkPutObject5MbErasure - Benchmark Erasure.PutObject() for object size of 5MB.
+// BenchmarkPutObject5MbErasure - Benchmark Erasure.PutObjectMeta() for object size of 5MB.
 func BenchmarkPutObject5MbErasure(b *testing.B) {
 	benchmarkPutObject(b, "Erasure", 5*humanize.MiByte)
 }
 
-// BenchmarkPutObject10MbFS - Benchmark FS.PutObject() for object size of 10MB.
+// BenchmarkPutObject10MbFS - Benchmark FS.PutObjectMeta() for object size of 10MB.
 func BenchmarkPutObject10MbFS(b *testing.B) {
 	benchmarkPutObject(b, "FS", 10*humanize.MiByte)
 }
 
-// BenchmarkPutObject10MbErasure - Benchmark Erasure.PutObject() for object size of 10MB.
+// BenchmarkPutObject10MbErasure - Benchmark Erasure.PutObjectMeta() for object size of 10MB.
 func BenchmarkPutObject10MbErasure(b *testing.B) {
 	benchmarkPutObject(b, "Erasure", 10*humanize.MiByte)
 }
 
-// BenchmarkPutObject25MbFS - Benchmark FS.PutObject() for object size of 25MB.
+// BenchmarkPutObject25MbFS - Benchmark FS.PutObjectMeta() for object size of 25MB.
 func BenchmarkPutObject25MbFS(b *testing.B) {
 	benchmarkPutObject(b, "FS", 25*humanize.MiByte)
 }
 
-// BenchmarkPutObject25MbErasure - Benchmark Erasure.PutObject() for object size of 25MB.
+// BenchmarkPutObject25MbErasure - Benchmark Erasure.PutObjectMeta() for object size of 25MB.
 func BenchmarkPutObject25MbErasure(b *testing.B) {
 	benchmarkPutObject(b, "Erasure", 25*humanize.MiByte)
 }
 
-// BenchmarkPutObject50MbFS - Benchmark FS.PutObject() for object size of 50MB.
+// BenchmarkPutObject50MbFS - Benchmark FS.PutObjectMeta() for object size of 50MB.
 func BenchmarkPutObject50MbFS(b *testing.B) {
 	benchmarkPutObject(b, "FS", 50*humanize.MiByte)
 }
 
-// BenchmarkPutObject50MbErasure - Benchmark Erasure.PutObject() for object size of 50MB.
+// BenchmarkPutObject50MbErasure - Benchmark Erasure.PutObjectMeta() for object size of 50MB.
 func BenchmarkPutObject50MbErasure(b *testing.B) {
 	benchmarkPutObject(b, "Erasure", 50*humanize.MiByte)
 }
 
-// parallel benchmarks for ObjectLayer.PutObject() .
+// parallel benchmarks for ObjectLayer.PutObjectMeta() .
 
-// BenchmarkParallelPutObjectVerySmallFS - BenchmarkParallel FS.PutObject() for object size of 10 bytes.
+// BenchmarkParallelPutObjectVerySmallFS - BenchmarkParallel FS.PutObjectMeta() for object size of 10 bytes.
 func BenchmarkParallelPutObjectVerySmallFS(b *testing.B) {
 	benchmarkPutObjectParallel(b, "FS", 10)
 }
 
-// BenchmarkParallelPutObjectVerySmallErasure - BenchmarkParallel Erasure.PutObject() for object size of 10 bytes.
+// BenchmarkParallelPutObjectVerySmallErasure - BenchmarkParallel Erasure.PutObjectMeta() for object size of 10 bytes.
 func BenchmarkParallelPutObjectVerySmallErasure(b *testing.B) {
 	benchmarkPutObjectParallel(b, "Erasure", 10)
 }
 
-// BenchmarkParallelPutObject10KbFS - BenchmarkParallel FS.PutObject() for object size of 10KB.
+// BenchmarkParallelPutObject10KbFS - BenchmarkParallel FS.PutObjectMeta() for object size of 10KB.
 func BenchmarkParallelPutObject10KbFS(b *testing.B) {
 	benchmarkPutObjectParallel(b, "FS", 10*humanize.KiByte)
 }
 
-// BenchmarkParallelPutObject10KbErasure - BenchmarkParallel Erasure.PutObject() for object size of 10KB.
+// BenchmarkParallelPutObject10KbErasure - BenchmarkParallel Erasure.PutObjectMeta() for object size of 10KB.
 func BenchmarkParallelPutObject10KbErasure(b *testing.B) {
 	benchmarkPutObjectParallel(b, "Erasure", 10*humanize.KiByte)
 }
 
-// BenchmarkParallelPutObject100KbFS - BenchmarkParallel FS.PutObject() for object size of 100KB.
+// BenchmarkParallelPutObject100KbFS - BenchmarkParallel FS.PutObjectMeta() for object size of 100KB.
 func BenchmarkParallelPutObject100KbFS(b *testing.B) {
 	benchmarkPutObjectParallel(b, "FS", 100*humanize.KiByte)
 }
 
-// BenchmarkParallelPutObject100KbErasure - BenchmarkParallel Erasure.PutObject() for object size of 100KB.
+// BenchmarkParallelPutObject100KbErasure - BenchmarkParallel Erasure.PutObjectMeta() for object size of 100KB.
 func BenchmarkParallelPutObject100KbErasure(b *testing.B) {
 	benchmarkPutObjectParallel(b, "Erasure", 100*humanize.KiByte)
 }
 
-// BenchmarkParallelPutObject1MbFS - BenchmarkParallel FS.PutObject() for object size of 1MB.
+// BenchmarkParallelPutObject1MbFS - BenchmarkParallel FS.PutObjectMeta() for object size of 1MB.
 func BenchmarkParallelPutObject1MbFS(b *testing.B) {
 	benchmarkPutObjectParallel(b, "FS", 1*humanize.MiByte)
 }
 
-// BenchmarkParallelPutObject1MbErasure - BenchmarkParallel Erasure.PutObject() for object size of 1MB.
+// BenchmarkParallelPutObject1MbErasure - BenchmarkParallel Erasure.PutObjectMeta() for object size of 1MB.
 func BenchmarkParallelPutObject1MbErasure(b *testing.B) {
 	benchmarkPutObjectParallel(b, "Erasure", 1*humanize.MiByte)
 }
 
-// BenchmarkParallelPutObject5MbFS - BenchmarkParallel FS.PutObject() for object size of 5MB.
+// BenchmarkParallelPutObject5MbFS - BenchmarkParallel FS.PutObjectMeta() for object size of 5MB.
 func BenchmarkParallelPutObject5MbFS(b *testing.B) {
 	benchmarkPutObjectParallel(b, "FS", 5*humanize.MiByte)
 }
 
-// BenchmarkParallelPutObject5MbErasure - BenchmarkParallel Erasure.PutObject() for object size of 5MB.
+// BenchmarkParallelPutObject5MbErasure - BenchmarkParallel Erasure.PutObjectMeta() for object size of 5MB.
 func BenchmarkParallelPutObject5MbErasure(b *testing.B) {
 	benchmarkPutObjectParallel(b, "Erasure", 5*humanize.MiByte)
 }
 
-// BenchmarkParallelPutObject10MbFS - BenchmarkParallel FS.PutObject() for object size of 10MB.
+// BenchmarkParallelPutObject10MbFS - BenchmarkParallel FS.PutObjectMeta() for object size of 10MB.
 func BenchmarkParallelPutObject10MbFS(b *testing.B) {
 	benchmarkPutObjectParallel(b, "FS", 10*humanize.MiByte)
 }
 
-// BenchmarkParallelPutObject10MbErasure - BenchmarkParallel Erasure.PutObject() for object size of 10MB.
+// BenchmarkParallelPutObject10MbErasure - BenchmarkParallel Erasure.PutObjectMeta() for object size of 10MB.
 func BenchmarkParallelPutObject10MbErasure(b *testing.B) {
 	benchmarkPutObjectParallel(b, "Erasure", 10*humanize.MiByte)
 }
 
-// BenchmarkParallelPutObject25MbFS - BenchmarkParallel FS.PutObject() for object size of 25MB.
+// BenchmarkParallelPutObject25MbFS - BenchmarkParallel FS.PutObjectMeta() for object size of 25MB.
 func BenchmarkParallelPutObject25MbFS(b *testing.B) {
 	benchmarkPutObjectParallel(b, "FS", 25*humanize.MiByte)
 }
 
-// BenchmarkParallelPutObject25MbErasure - BenchmarkParallel Erasure.PutObject() for object size of 25MB.
+// BenchmarkParallelPutObject25MbErasure - BenchmarkParallel Erasure.PutObjectMeta() for object size of 25MB.
 func BenchmarkParallelPutObject25MbErasure(b *testing.B) {
 	benchmarkPutObjectParallel(b, "Erasure", 25*humanize.MiByte)
 }

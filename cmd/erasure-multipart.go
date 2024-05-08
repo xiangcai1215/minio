@@ -1006,9 +1006,9 @@ func (er erasureObjects) CompleteMultipartUpload(ctx context.Context, bucket str
 	// However, in case of encryption, the persisted part ETags don't match
 	// what we have sent to the client during PutObjectPart. The reason is
 	// that ETags are encrypted. Hence, the client will send a list of complete
-	// part ETags of which non can match the ETag of any part. For example
-	//   ETag (client):          30902184f4e62dd8f98f0aaff810c626
-	//   ETag (server-internal): 20000f00ce5dc16e3f3b124f586ae1d88e9caa1c598415c2759bbb50e84a59f630902184f4e62dd8f98f0aaff810c626
+	// part ETags of which non can match the Etag of any part. For example
+	//   Etag (client):          30902184f4e62dd8f98f0aaff810c626
+	//   Etag (server-internal): 20000f00ce5dc16e3f3b124f586ae1d88e9caa1c598415c2759bbb50e84a59f630902184f4e62dd8f98f0aaff810c626
 	//
 	// Therefore, we adjust all ETags sent by the client to match what is stored
 	// on the backend.
@@ -1102,7 +1102,7 @@ func (er erasureObjects) CompleteMultipartUpload(ctx context.Context, bucket str
 		}
 		expPart := currentFI.Parts[partIdx]
 
-		// ensure that part ETag is canonicalized to strip off extraneous quotes
+		// ensure that part Etag is canonicalized to strip off extraneous quotes
 		part.ETag = canonicalizeETag(part.ETag)
 		expETag := tryDecryptETag(objectEncryptionKey, expPart.ETag, kind == crypto.S3)
 		if expETag != part.ETag {
@@ -1204,7 +1204,7 @@ func (er erasureObjects) CompleteMultipartUpload(ctx context.Context, bucket str
 	}
 
 	// Save successfully calculated md5sum.
-	// for replica, newMultipartUpload would have already sent the replication ETag
+	// for replica, newMultipartUpload would have already sent the replication Etag
 	if fi.Metadata["etag"] == "" {
 		if opts.UserDefined["etag"] != "" {
 			fi.Metadata["etag"] = opts.UserDefined["etag"]

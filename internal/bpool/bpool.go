@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+// 实现了一个字节池
 package bpool
 
 // BytePoolCap implements a leaky pool of []byte in the form of a bounded channel.

@@ -1478,7 +1478,7 @@ type xlMetaDataDirDecoder struct {
 
 // UpdateObjectVersion updates metadata and modTime for a given
 // versionID, NOTE: versionID must be valid and should exist -
-// and must not be a DeleteMarker or legacy object, if no
+// and must not be a IsDeleteMarker or legacy object, if no
 // versionID is specified 'null' versionID is updated instead.
 //
 // It is callers responsibility to set correct versionID, this

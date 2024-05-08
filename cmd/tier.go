@@ -284,7 +284,7 @@ func (config *TierConfigMgr) getDriver(tierName string) (d WarmBackend, err erro
 }
 
 // configReader returns a PutObjReader and ObjectOptions needed to save config
-// using a PutObject API. PutObjReader encrypts json encoded tier configurations
+// using a PutObjectMeta API. PutObjReader encrypts json encoded tier configurations
 // if KMS is enabled, otherwise simply yields the json encoded bytes as is.
 // Similarly, ObjectOptions value depends on KMS' status.
 func (config *TierConfigMgr) configReader(ctx context.Context) (*PutObjReader, *ObjectOptions, error) {

@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"path"
 	"sort"
@@ -515,6 +516,7 @@ func (m *metaCacheEntriesSorted) fileInfoVersions(bucket, prefix, delimiter, aft
 			}
 
 			fiVersions := fiv.Versions
+			// 如果设置VersionID，这个获取文件的特定版本
 			if afterV != "" {
 				vidMarkerIdx := fiv.findVersionIndex(afterV)
 				if vidMarkerIdx >= 0 {
@@ -563,9 +565,10 @@ func (m *metaCacheEntriesSorted) fileInfos(bucket, prefix, delimiter string) (ob
 	prevPrefix := ""
 
 	vcfg, _ := globalBucketVersioningSys.Get(bucket)
-
+	fmt.Println("m.o", len(m.o))
 	for _, entry := range m.o {
 		if entry.isObject() {
+			// 如果对象名恰好是 delimiter 的前缀，那么这个对象是一个目录
 			if delimiter != "" {
 				idx := strings.Index(strings.TrimPrefix(entry.name, prefix), delimiter)
 				if idx >= 0 {
@@ -575,6 +578,7 @@ func (m *metaCacheEntriesSorted) fileInfos(bucket, prefix, delimiter string) (ob
 						continue
 					}
 					prevPrefix = currPrefix
+					// 会把name设置为前缀
 					objects = append(objects, ObjectInfo{
 						IsDir:  true,
 						Bucket: bucket,
@@ -583,7 +587,8 @@ func (m *metaCacheEntriesSorted) fileInfos(bucket, prefix, delimiter string) (ob
 					continue
 				}
 			}
-
+			fmt.Println("entry.name", entry.name)
+			// 如果是对象，并且前缀和delimiter不匹配，会增加到列表
 			fi, err := entry.fileInfo(bucket)
 			if err == nil {
 				versioned := vcfg != nil && vcfg.Versioned(entry.name)
@@ -595,6 +600,7 @@ func (m *metaCacheEntriesSorted) fileInfos(bucket, prefix, delimiter string) (ob
 			if delimiter == "" {
 				continue
 			}
+			// 如果是目录，前缀不匹配，Object都不会增加到列表
 			idx := strings.Index(strings.TrimPrefix(entry.name, prefix), delimiter)
 			if idx < 0 {
 				continue
@@ -639,6 +645,7 @@ func (m *metaCacheEntriesSorted) forwardPast(s string) {
 	if s == "" {
 		return
 	}
+	// 获取Marker以后的数据
 	idx := sort.Search(len(m.o), func(i int) bool {
 		return m.o[i].name > s
 	})

@@ -22,11 +22,12 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/minio/minio/internal/bucket/lifecycle"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/minio/minio/internal/bucket/lifecycle"
 
 	"github.com/Azure/azure-storage-blob-go/azblob"
 	"github.com/minio/minio/internal/ioutil"
@@ -72,6 +73,8 @@ type APIErrorResponse struct {
 // APIErrorCode type of error status.
 type APIErrorCode int
 
+// 将APIErrorCode生成字符串，并且移除前缀Err，会生成一个到一个文件中，文件名为api_error_code_string.go
+//需要下载go get golang.org/x/tools/cmd/stringer
 //go:generate stringer -type=APIErrorCode -trimprefix=Err $GOFILE
 
 // Error codes, non exhaustive list - http://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html
@@ -2076,6 +2079,7 @@ func toAPIErrorCode(ctx context.Context, err error) (apiErr APIErrorCode) {
 	// Unwrap the error first
 	err = unwrapAll(err)
 
+	// 比较err的错误信息，这个一般这个Handler层定义的错误信息，可以直接比较
 	switch err {
 	case errInvalidArgument:
 		apiErr = ErrAdminInvalidArgument
@@ -2186,6 +2190,7 @@ func toAPIErrorCode(ctx context.Context, err error) (apiErr APIErrorCode) {
 		return ErrNoSuchBucket
 	}
 
+	// 比较err类型，如果是存储引擎返回的错误，可以通过比较type
 	switch err.(type) {
 	case StorageFull:
 		apiErr = ErrStorageFull
@@ -2377,6 +2382,9 @@ func toAPIError(ctx context.Context, err error) APIError {
 		return noError
 	}
 
+	// 1. 底层用toObjectErr返回的错误
+	// 2. 把ObjectErr 缓存APIErrorCode
+	// 3. 根据API填充更加详细的错误信息，APIErr
 	apiErr := errorCodes.ToAPIErr(toAPIErrorCode(ctx, err))
 	switch apiErr.Code {
 	case "NotImplemented":

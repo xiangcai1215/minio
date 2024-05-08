@@ -148,13 +148,13 @@ var decryptETagTests = []struct {
 		ObjectKey:  [32]byte{},
 		ObjectInfo: ObjectInfo{ETag: "20000f00f27834c9a2654927546df57f9e998187496394d4ee80f3d9978f85f3c7d81f72600cdbe03d80dc5a13d6935"},
 		ETag:       "",
-		ShouldFail: true, // ETag is not a valid hex value
+		ShouldFail: true, // Etag is not a valid hex value
 	},
 	{
 		ObjectKey:  [32]byte{},
 		ObjectInfo: ObjectInfo{ETag: "00000f00f27834c9a2654927546df57f9e998187496394d4ee80f3d9978f85f3c7d81f72600cdbe03d80dc5a13d69354"},
 		ETag:       "",
-		ShouldFail: true, // modified ETag
+		ShouldFail: true, // modified Etag
 	},
 
 	// Special tests for ETags that end with a '-x'
@@ -178,13 +178,13 @@ var decryptETagTests = []struct {
 		ObjectKey:  [32]byte{},
 		ObjectInfo: ObjectInfo{ETag: "16516b396f0f4d4f2a0e7177557bec4-1"},
 		ETag:       "",
-		ShouldFail: true, // ETag prefix is not a valid hex value
+		ShouldFail: true, // Etag prefix is not a valid hex value
 	},
 	{
 		ObjectKey:  [32]byte{},
 		ObjectInfo: ObjectInfo{ETag: "16516b396f0f4d4f2a0e7177557bec4-1-2"},
 		ETag:       "",
-		ShouldFail: true, // ETag contains multiple: -
+		ShouldFail: true, // Etag contains multiple: -
 	},
 }
 
@@ -199,7 +199,7 @@ func TestDecryptETag(t *testing.T) {
 		}
 		if err == nil {
 			if etag != test.ETag {
-				t.Fatalf("Test %d: ETag mismatch: got %s - want %s", i, etag, test.ETag)
+				t.Fatalf("Test %d: Etag mismatch: got %s - want %s", i, etag, test.ETag)
 			}
 		}
 	}

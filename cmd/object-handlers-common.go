@@ -104,24 +104,24 @@ func checkCopyObjectPreconditions(ctx context.Context, w http.ResponseWriter, r 
 		}
 	}
 
-	// x-amz-copy-source-if-match : Return the object only if its entity tag (ETag) is the
+	// x-amz-copy-source-if-match : Return the object only if its entity tag (Etag) is the
 	// same as the one specified; otherwise return a 412 (precondition failed).
 	ifMatchETagHeader := r.Header.Get(xhttp.AmzCopySourceIfMatch)
 	if ifMatchETagHeader != "" {
 		if !isETagEqual(objInfo.ETag, ifMatchETagHeader) {
-			// If the object ETag does not match with the specified ETag.
+			// If the object Etag does not match with the specified Etag.
 			writeHeaders()
 			writeErrorResponse(ctx, w, errorCodes.ToAPIErr(ErrPreconditionFailed), r.URL)
 			return true
 		}
 	}
 
-	// If-None-Match : Return the object only if its entity tag (ETag) is different from the
+	// If-None-Match : Return the object only if its entity tag (Etag) is different from the
 	// one specified otherwise, return a 304 (not modified).
 	ifNoneMatchETagHeader := r.Header.Get(xhttp.AmzCopySourceIfNoneMatch)
 	if ifNoneMatchETagHeader != "" {
 		if isETagEqual(objInfo.ETag, ifNoneMatchETagHeader) {
-			// If the object ETag matches with the specified ETag.
+			// If the object Etag matches with the specified Etag.
 			writeHeaders()
 			writeErrorResponse(ctx, w, errorCodes.ToAPIErr(ErrPreconditionFailed), r.URL)
 			return true
@@ -166,24 +166,24 @@ func checkPreconditionsPUT(ctx context.Context, w http.ResponseWriter, r *http.R
 		}
 	}
 
-	// If-Match : Return the object only if its entity tag (ETag) is the same as the one specified;
+	// If-Match : Return the object only if its entity tag (Etag) is the same as the one specified;
 	// otherwise return a 412 (precondition failed).
 	ifMatchETagHeader := r.Header.Get(xhttp.IfMatch)
 	if ifMatchETagHeader != "" {
 		if !isETagEqual(objInfo.ETag, ifMatchETagHeader) {
-			// If the object ETag does not match with the specified ETag.
+			// If the object Etag does not match with the specified Etag.
 			writeHeaders()
 			writeErrorResponse(ctx, w, errorCodes.ToAPIErr(ErrPreconditionFailed), r.URL)
 			return true
 		}
 	}
 
-	// If-None-Match : Return the object only if its entity tag (ETag) is different from the
+	// If-None-Match : Return the object only if its entity tag (Etag) is different from the
 	// one specified otherwise, return a 304 (not modified).
 	ifNoneMatchETagHeader := r.Header.Get(xhttp.IfNoneMatch)
 	if ifNoneMatchETagHeader != "" {
 		if isETagEqual(objInfo.ETag, ifNoneMatchETagHeader) {
-			// If the object ETag matches with the specified ETag.
+			// If the object Etag matches with the specified Etag.
 			writeHeaders()
 			w.WriteHeader(http.StatusNotModified)
 			return true
@@ -269,24 +269,24 @@ func checkPreconditions(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	// If-Match : Return the object only if its entity tag (ETag) is the same as the one specified;
+	// If-Match : Return the object only if its entity tag (Etag) is the same as the one specified;
 	// otherwise return a 412 (precondition failed).
 	ifMatchETagHeader := r.Header.Get(xhttp.IfMatch)
 	if ifMatchETagHeader != "" {
 		if !isETagEqual(objInfo.ETag, ifMatchETagHeader) {
-			// If the object ETag does not match with the specified ETag.
+			// If the object Etag does not match with the specified Etag.
 			writeHeaders()
 			writeErrorResponse(ctx, w, errorCodes.ToAPIErr(ErrPreconditionFailed), r.URL)
 			return true
 		}
 	}
 
-	// If-None-Match : Return the object only if its entity tag (ETag) is different from the
+	// If-None-Match : Return the object only if its entity tag (Etag) is different from the
 	// one specified otherwise, return a 304 (not modified).
 	ifNoneMatchETagHeader := r.Header.Get(xhttp.IfNoneMatch)
 	if ifNoneMatchETagHeader != "" {
 		if isETagEqual(objInfo.ETag, ifNoneMatchETagHeader) {
-			// If the object ETag matches with the specified ETag.
+			// If the object Etag matches with the specified Etag.
 			writeHeaders()
 			w.WriteHeader(http.StatusNotModified)
 			return true
@@ -303,13 +303,13 @@ func ifModifiedSince(objTime time.Time, givenTime time.Time) bool {
 	return objTime.After(givenTime.Add(1 * time.Second))
 }
 
-// canonicalizeETag returns ETag with leading and trailing double-quotes removed,
+// canonicalizeETag returns Etag with leading and trailing double-quotes removed,
 // if any present
 func canonicalizeETag(etag string) string {
 	return etagRegex.ReplaceAllString(etag, "$1")
 }
 
-// isETagEqual return true if the canonical representations of two ETag strings
+// isETagEqual return true if the canonical representations of two Etag strings
 // are equal, false otherwise
 func isETagEqual(left, right string) bool {
 	return canonicalizeETag(left) == canonicalizeETag(right)
@@ -320,8 +320,8 @@ func isETagEqual(left, right string) bool {
 // to activate delete only headers set delete as true
 func setPutObjHeaders(w http.ResponseWriter, objInfo ObjectInfo, delete bool) {
 	// We must not use the http.Header().Set method here because some (broken)
-	// clients expect the ETag header key to be literally "ETag" - not "Etag" (case-sensitive).
-	// Therefore, we have to set the ETag directly as map entry.
+	// clients expect the Etag header key to be literally "Etag" - not "Etag" (case-sensitive).
+	// Therefore, we have to set the Etag directly as map entry.
 	if objInfo.ETag != "" && !delete {
 		w.Header()[xhttp.ETag] = []string{`"` + objInfo.ETag + `"`}
 	}

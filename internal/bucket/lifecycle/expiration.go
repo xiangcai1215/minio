@@ -172,7 +172,7 @@ func (e Expiration) Validate() error {
 		return nil
 	}
 
-	// DeleteMarker cannot be specified if date or dates are specified.
+	// IsDeleteMarker cannot be specified if date or dates are specified.
 	if (!e.IsDaysNull() || !e.IsDateNull()) && e.DeleteMarker.set {
 		return errLifecycleInvalidDeleteMarker
 	}

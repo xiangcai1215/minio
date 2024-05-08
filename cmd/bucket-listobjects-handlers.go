@@ -19,6 +19,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -124,7 +125,13 @@ func (api objectAPIHandlers) listObjectVersionsHandler(w http.ResponseWriter, r 
 		writeErrorResponse(ctx, w, toAPIError(ctx, err), r.URL)
 		return
 	}
+	for _, obj := range listObjectVersionsInfo.Objects {
+		fmt.Printf("%+v, \nlistObjectVersionsInfo---: ", obj)
+	}
+
 	response := generateListVersionsResponse(bucket, prefix, marker, versionIDMarker, delimiter, encodingType, maxkeys, listObjectVersionsInfo, checkObjMeta)
+
+	fmt.Printf(" \n response---: -------%+v, \n", response)
 
 	// Write success response.
 	writeSuccessResponseXML(w, encodeResponseList(response))

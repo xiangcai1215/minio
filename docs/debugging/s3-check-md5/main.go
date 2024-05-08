@@ -159,11 +159,11 @@ func main() {
 				continue
 			}
 			if _, ok := object.UserMetadata["X-Amz-Server-Side-Encryption-Customer-Algorithm"]; ok {
-				log.Println("SKIPPED: Objects encrypted with SSE-C do not have md5sum as ETag:", objFullPath(object))
+				log.Println("SKIPPED: Objects encrypted with SSE-C do not have md5sum as Etag:", objFullPath(object))
 				continue
 			}
 			if v, ok := object.UserMetadata["X-Amz-Server-Side-Encryption"]; ok && v == "aws:kms" {
-				log.Println("FAILED: encrypted with SSE-KMS do not have md5sum as ETag:", objFullPath(object))
+				log.Println("FAILED: encrypted with SSE-KMS do not have md5sum as Etag:", objFullPath(object))
 				continue
 			}
 			parts := 1

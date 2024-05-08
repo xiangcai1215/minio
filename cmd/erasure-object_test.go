@@ -535,13 +535,13 @@ func TestGetObjectNoQuorum(t *testing.T) {
 	gr, err := xl.GetObjectNInfo(ctx, bucket, object, nil, nil, opts)
 	if err != nil {
 		if err != toObjectErr(errErasureReadQuorum, bucket, object) {
-			t.Errorf("Expected GetObject to fail with %v, but failed with %v", toObjectErr(errErasureReadQuorum, bucket, object), err)
+			t.Errorf("Expected GetObjectMeta to fail with %v, but failed with %v", toObjectErr(errErasureReadQuorum, bucket, object), err)
 		}
 	}
 	if gr != nil {
 		_, err = io.Copy(io.Discard, gr)
 		if err != toObjectErr(errErasureReadQuorum, bucket, object) {
-			t.Errorf("Expected GetObject to fail with %v, but failed with %v", toObjectErr(errErasureReadQuorum, bucket, object), err)
+			t.Errorf("Expected GetObjectMeta to fail with %v, but failed with %v", toObjectErr(errErasureReadQuorum, bucket, object), err)
 		}
 		gr.Close()
 	}
@@ -580,13 +580,13 @@ func TestGetObjectNoQuorum(t *testing.T) {
 		gr, err := xl.GetObjectNInfo(ctx, bucket, object, nil, nil, opts)
 		if err != nil {
 			if err != toObjectErr(errErasureReadQuorum, bucket, object) {
-				t.Errorf("Expected GetObject to fail with %v, but failed with %v", toObjectErr(errErasureReadQuorum, bucket, object), err)
+				t.Errorf("Expected GetObjectMeta to fail with %v, but failed with %v", toObjectErr(errErasureReadQuorum, bucket, object), err)
 			}
 		}
 		if gr != nil {
 			_, err = io.Copy(io.Discard, gr)
 			if err != toObjectErr(errErasureReadQuorum, bucket, object) {
-				t.Errorf("Expected GetObject to fail with %v, but failed with %v", toObjectErr(errErasureReadQuorum, bucket, object), err)
+				t.Errorf("Expected GetObjectMeta to fail with %v, but failed with %v", toObjectErr(errErasureReadQuorum, bucket, object), err)
 			}
 			gr.Close()
 		}
@@ -798,7 +798,7 @@ func TestPutObjectNoQuorumSmall(t *testing.T) {
 	}
 }
 
-// Test PutObject twice, one small and another bigger
+// Test PutObjectMeta twice, one small and another bigger
 // than small data thresold and checks reading them again
 func TestPutObjectSmallInlineData(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -833,12 +833,12 @@ func TestPutObjectSmallInlineData(t *testing.T) {
 	}
 	gr, err := obj.GetObjectNInfo(ctx, bucket, object, nil, nil, ObjectOptions{})
 	if err != nil {
-		t.Fatalf("Expected GetObject to succeed, but failed with %v", err)
+		t.Fatalf("Expected GetObjectMeta to succeed, but failed with %v", err)
 	}
 	output := bytes.NewBuffer([]byte{})
 	_, err = io.Copy(output, gr)
 	if err != nil {
-		t.Fatalf("Expected GetObject reading data to succeed, but failed with %v", err)
+		t.Fatalf("Expected GetObjectMeta reading data to succeed, but failed with %v", err)
 	}
 	gr.Close()
 	if !bytes.Equal(output.Bytes(), smallData) {
@@ -857,11 +857,11 @@ func TestPutObjectSmallInlineData(t *testing.T) {
 	}
 	gr, err = obj.GetObjectNInfo(ctx, bucket, object, nil, nil, ObjectOptions{})
 	if err != nil {
-		t.Fatalf("Expected GetObject to succeed, but failed with %v", err)
+		t.Fatalf("Expected GetObjectMeta to succeed, but failed with %v", err)
 	}
 	_, err = io.Copy(output, gr)
 	if err != nil {
-		t.Fatalf("Expected GetObject reading data to succeed, but failed with %v", err)
+		t.Fatalf("Expected GetObjectMeta reading data to succeed, but failed with %v", err)
 	}
 	gr.Close()
 	if !bytes.Equal(output.Bytes(), bigData) {
@@ -893,7 +893,7 @@ func testObjectQuorumFromMeta(obj ObjectLayer, instanceType string, dirs []strin
 		t.Fatalf("Failed to make a bucket %v", err)
 	}
 
-	// Object for test case 1 - No StorageClass defined, no MetaData in PutObject
+	// Object for test case 1 - No StorageClass defined, no MetaData in PutObjectMeta
 	object1 := "object1"
 	globalStorageClass.Update(storageclass.Config{
 		RRS: storageclass.StorageClass{
@@ -911,7 +911,7 @@ func testObjectQuorumFromMeta(obj ObjectLayer, instanceType string, dirs []strin
 	parts1, errs1 := readAllFileInfo(ctx, erasureDisks, bucket, object1, "", false)
 	parts1SC := globalStorageClass
 
-	// Object for test case 2 - No StorageClass defined, MetaData in PutObject requesting RRS Class
+	// Object for test case 2 - No StorageClass defined, MetaData in PutObjectMeta requesting RRS Class
 	object2 := "object2"
 	metadata2 := make(map[string]string)
 	metadata2["x-amz-storage-class"] = storageclass.RRS
@@ -923,7 +923,7 @@ func testObjectQuorumFromMeta(obj ObjectLayer, instanceType string, dirs []strin
 	parts2, errs2 := readAllFileInfo(ctx, erasureDisks, bucket, object2, "", false)
 	parts2SC := globalStorageClass
 
-	// Object for test case 3 - No StorageClass defined, MetaData in PutObject requesting Standard Storage Class
+	// Object for test case 3 - No StorageClass defined, MetaData in PutObjectMeta requesting Standard Storage Class
 	object3 := "object3"
 	metadata3 := make(map[string]string)
 	metadata3["x-amz-storage-class"] = storageclass.STANDARD
@@ -935,7 +935,7 @@ func testObjectQuorumFromMeta(obj ObjectLayer, instanceType string, dirs []strin
 	parts3, errs3 := readAllFileInfo(ctx, erasureDisks, bucket, object3, "", false)
 	parts3SC := globalStorageClass
 
-	// Object for test case 4 - Standard StorageClass defined as Parity 6, MetaData in PutObject requesting Standard Storage Class
+	// Object for test case 4 - Standard StorageClass defined as Parity 6, MetaData in PutObjectMeta requesting Standard Storage Class
 	object4 := "object4"
 	metadata4 := make(map[string]string)
 	metadata4["x-amz-storage-class"] = storageclass.STANDARD
@@ -957,7 +957,7 @@ func testObjectQuorumFromMeta(obj ObjectLayer, instanceType string, dirs []strin
 		},
 	}
 
-	// Object for test case 5 - RRS StorageClass defined as Parity 2, MetaData in PutObject requesting RRS Class
+	// Object for test case 5 - RRS StorageClass defined as Parity 2, MetaData in PutObjectMeta requesting RRS Class
 	// Reset global storage class flags
 	object5 := "object5"
 	metadata5 := make(map[string]string)
@@ -976,7 +976,7 @@ func testObjectQuorumFromMeta(obj ObjectLayer, instanceType string, dirs []strin
 	parts5, errs5 := readAllFileInfo(ctx, erasureDisks, bucket, object5, "", false)
 	parts5SC := globalStorageClass
 
-	// Object for test case 6 - RRS StorageClass defined as Parity 2, MetaData in PutObject requesting Standard Storage Class
+	// Object for test case 6 - RRS StorageClass defined as Parity 2, MetaData in PutObjectMeta requesting Standard Storage Class
 	object6 := "object6"
 	metadata6 := make(map[string]string)
 	metadata6["x-amz-storage-class"] = storageclass.STANDARD
@@ -1001,7 +1001,7 @@ func testObjectQuorumFromMeta(obj ObjectLayer, instanceType string, dirs []strin
 		},
 	}
 
-	// Object for test case 7 - Standard StorageClass defined as Parity 5, MetaData in PutObject requesting RRS Class
+	// Object for test case 7 - Standard StorageClass defined as Parity 5, MetaData in PutObjectMeta requesting RRS Class
 	// Reset global storage class flags
 	object7 := "object7"
 	metadata7 := make(map[string]string)
@@ -1101,13 +1101,13 @@ func TestGetObjectInlineNotInline(t *testing.T) {
 	// Try to read the object and check its md5sum
 	gr, err := objLayer.GetObjectNInfo(ctx, "testbucket", "file", nil, nil, ObjectOptions{})
 	if err != nil {
-		t.Fatalf("Expected GetObject to succeed, but failed with %v", err)
+		t.Fatalf("Expected GetObjectMeta to succeed, but failed with %v", err)
 	}
 
 	h := md5.New()
 	_, err = io.Copy(h, gr)
 	if err != nil {
-		t.Fatalf("Expected GetObject reading data to succeed, but failed with %v", err)
+		t.Fatalf("Expected GetObjectMeta reading data to succeed, but failed with %v", err)
 	}
 	gr.Close()
 
@@ -1195,7 +1195,7 @@ func TestGetObjectWithOutdatedDisks(t *testing.T) {
 		sets.erasureDisksMu.Unlock()
 		gr, err := z.GetObjectNInfo(ctx, testCase.bucket, testCase.object, nil, nil, ObjectOptions{VersionID: got.VersionID})
 		if err != nil {
-			t.Fatalf("Expected GetObject to succeed, but failed with %v", err)
+			t.Fatalf("Expected GetObjectMeta to succeed, but failed with %v", err)
 		}
 
 		h := md5.New()

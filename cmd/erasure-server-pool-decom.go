@@ -635,7 +635,7 @@ func (z *erasureServerPools) decommissionObject(ctx context.Context, bucket stri
 				part.Number,
 				NewPutObjReader(hr),
 				ObjectOptions{
-					PreserveETag: part.ETag, // Preserve original ETag to ensure same metadata.
+					PreserveETag: part.ETag, // Preserve original Etag to ensure same metadata.
 					IndexCB: func() []byte {
 						return part.Index // Preserve part Index to ensure decompression works.
 					},
@@ -673,13 +673,13 @@ func (z *erasureServerPools) decommissionObject(ctx context.Context, bucket stri
 			VersionID:    objInfo.VersionID,
 			MTime:        objInfo.ModTime,
 			UserDefined:  objInfo.UserDefined,
-			PreserveETag: objInfo.ETag, // Preserve original ETag to ensure same metadata.
+			PreserveETag: objInfo.ETag, // Preserve original Etag to ensure same metadata.
 			IndexCB: func() []byte {
 				return objInfo.Parts[0].Index // Preserve part Index to ensure decompression works.
 			},
 		})
 	if err != nil {
-		err = fmt.Errorf("decommissionObject: PutObject() %w", err)
+		err = fmt.Errorf("decommissionObject: PutObjectMeta() %w", err)
 	}
 	return err
 }

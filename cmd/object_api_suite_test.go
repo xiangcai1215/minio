@@ -218,7 +218,7 @@ func testMultipleObjectCreation(obj ObjectLayer, instanceType string, t TestErrH
 			t.Fatalf("%s: <ERROR> %s", instanceType, err)
 		}
 		if !bytes.Equal(byteBuffer.Bytes(), value) {
-			t.Errorf("%s: Mismatch of GetObject data with the expected one.", instanceType)
+			t.Errorf("%s: Mismatch of GetObjectMeta data with the expected one.", instanceType)
 		}
 
 		objInfo, err := obj.GetObjectInfo(context.Background(), "bucket", key, opts)
@@ -226,7 +226,7 @@ func testMultipleObjectCreation(obj ObjectLayer, instanceType string, t TestErrH
 			t.Fatalf("%s: <ERROR> %s", instanceType, err)
 		}
 		if objInfo.Size != int64(len(value)) {
-			t.Errorf("%s: Size mismatch of the GetObject data.", instanceType)
+			t.Errorf("%s: Size mismatch of the GetObjectMeta data.", instanceType)
 		}
 
 	}
@@ -596,7 +596,7 @@ func TestPutObject(t *testing.T) {
 	ExecExtendedObjectLayerTest(t, testPutObject)
 }
 
-// Tests validate PutObject without prefix.
+// Tests validate PutObjectMeta without prefix.
 func testPutObject(obj ObjectLayer, instanceType string, t TestErrHandler) {
 	content := []byte("testcontent")
 	length := int64(len(content))
@@ -640,7 +640,7 @@ func TestPutObjectInSubdir(t *testing.T) {
 	ExecExtendedObjectLayerTest(t, testPutObjectInSubdir)
 }
 
-// Tests validate PutObject with subdirectory prefix.
+// Tests validate PutObjectMeta with subdirectory prefix.
 func testPutObjectInSubdir(obj ObjectLayer, instanceType string, t TestErrHandler) {
 	err := obj.MakeBucket(context.Background(), "bucket", MakeBucketOptions{})
 	if err != nil {

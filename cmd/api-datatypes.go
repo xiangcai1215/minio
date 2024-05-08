@@ -24,7 +24,7 @@ import (
 
 // DeletedObject objects deleted
 type DeletedObject struct {
-	DeleteMarker          bool   `xml:"DeleteMarker,omitempty"`
+	DeleteMarker          bool   `xml:"IsDeleteMarker,omitempty"`
 	DeleteMarkerVersionID string `xml:"DeleteMarkerVersionId,omitempty"`
 	ObjectName            string `xml:"Key,omitempty"`
 	VersionID             string `xml:"VersionId,omitempty"`
@@ -57,9 +57,9 @@ type ObjectV struct {
 // ObjectToDelete carries key name for the object to delete.
 type ObjectToDelete struct {
 	ObjectV
-	// Replication status of DeleteMarker
+	// Replication status of IsDeleteMarker
 	DeleteMarkerReplicationStatus string `xml:"DeleteMarkerReplicationStatus"`
-	// Status of versioned delete (of object or DeleteMarker)
+	// Status of versioned delete (of object or IsDeleteMarker)
 	VersionPurgeStatus VersionPurgeStatusType `xml:"VersionPurgeStatus"`
 	// VersionPurgeStatuses holds the internal
 	VersionPurgeStatuses string `xml:"VersionPurgeStatuses"`

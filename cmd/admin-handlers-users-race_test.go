@@ -95,8 +95,8 @@ func (s *TestSuiteIAM) TestDeleteUserRace(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta",
     "s3:ListBucket"
    ],
    "Resource": [

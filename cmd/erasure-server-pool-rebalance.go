@@ -745,7 +745,7 @@ func (z *erasureServerPools) rebalanceObject(ctx context.Context, bucket string,
 				part.Number,
 				NewPutObjReader(hr),
 				ObjectOptions{
-					PreserveETag: part.ETag, // Preserve original ETag to ensure same metadata.
+					PreserveETag: part.ETag, // Preserve original Etag to ensure same metadata.
 					IndexCB: func() []byte {
 						return part.Index // Preserve part Index to ensure decompression works.
 					},
@@ -779,13 +779,13 @@ func (z *erasureServerPools) rebalanceObject(ctx context.Context, bucket string,
 			VersionID:    oi.VersionID,
 			MTime:        oi.ModTime,
 			UserDefined:  oi.UserDefined,
-			PreserveETag: oi.ETag, // Preserve original ETag to ensure same metadata.
+			PreserveETag: oi.ETag, // Preserve original Etag to ensure same metadata.
 			IndexCB: func() []byte {
 				return oi.Parts[0].Index // Preserve part Index to ensure decompression works.
 			},
 		})
 	if err != nil {
-		err = fmt.Errorf("rebalanceObject: PutObject() %w", err)
+		err = fmt.Errorf("rebalanceObject: PutObjectMeta() %w", err)
 	}
 	return err
 }

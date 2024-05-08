@@ -155,7 +155,7 @@ func getReadOnlyStatement(bucketName, prefix string) []miniogopolicy.Statement {
 			Effect:    string(policy.Allow),
 			Principal: miniogopolicy.User{AWS: set.CreateStringSet("*")},
 			Resources: set.CreateStringSet(policy.NewResource(bucketName + "/" + prefix).String()),
-			Actions:   set.CreateStringSet("s3:GetObject"),
+			Actions:   set.CreateStringSet("s3:GetObjectMeta"),
 		},
 	}
 }

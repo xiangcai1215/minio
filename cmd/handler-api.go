@@ -301,6 +301,7 @@ func maxClients(f http.HandlerFunc) http.HandlerFunc {
 		}
 
 		// 初始化一个chan，定义了chan的cap，如果chan满了，就会阻塞
+		// 初始化会给每个节点设计一个最大的连接数目，一般这个
 		pool, deadline := globalAPIConfig.getRequestsPool()
 		if pool == nil {
 			f.ServeHTTP(w, r)

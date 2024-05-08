@@ -194,7 +194,7 @@ func (sys *BucketMetadataSys) Update(ctx context.Context, bucket string, configF
 // but can be replaced atomically.
 //
 // This function should only be used with
-// - GetBucketInfo
+// - GetBucket
 // - ListBuckets
 // For all other bucket specific metadata, use the relevant
 // calls implemented specifically for each of those features.

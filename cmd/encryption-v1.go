@@ -100,7 +100,7 @@ func kmsKeyIDFromMetadata(metadata map[string]string) string {
 	return ARNPrefix + kmsID
 }
 
-// DecryptETags decryptes the ETag of all ObjectInfos using the KMS.
+// DecryptETags decryptes the Etag of all ObjectInfos using the KMS.
 //
 // It adjusts the size of all encrypted objects since encrypted
 // objects are slightly larger due to encryption overhead.
@@ -144,7 +144,7 @@ func DecryptETags(ctx context.Context, k kms.KMS, objects []ObjectInfo) error {
 
 		// If there are no SSE-S3 single-part objects
 		// we can skip the decryption process. However,
-		// we still have to adjust the size and ETag
+		// we still have to adjust the size and Etag
 		// of SSE-C and SSE-KMS objects.
 		if len(SSES3SinglePartObjects) == 0 {
 			for i := range batch {
@@ -227,7 +227,7 @@ func (o *ObjectInfo) isMultipart() bool {
 
 	// Further check if this object is uploaded using multipart mechanism
 	// by the user and it is not about Erasure internally splitting the
-	// object into parts in PutObject()
+	// object into parts in PutObjectMeta()
 	return !(o.backendType == BackendErasure && len(o.ETag) == 32)
 }
 
@@ -748,17 +748,17 @@ func (o ObjectInfo) DecryptedSize() (int64, error) {
 	return size, nil
 }
 
-// DecryptETag decrypts the ETag that is part of given object
+// DecryptETag decrypts the Etag that is part of given object
 // with the given object encryption key.
 //
-// However, DecryptETag does not try to decrypt the ETag if
+// However, DecryptETag does not try to decrypt the Etag if
 // it consists of a 128 bit hex value (32 hex chars) and exactly
 // one '-' followed by a 32-bit number.
 // This special case adresses randomly-generated ETags generated
 // by the MinIO server when running in non-compat mode. These
 // random ETags are not encrypt.
 //
-// Calling DecryptETag with a non-randomly generated ETag will
+// Calling DecryptETag with a non-randomly generated Etag will
 // fail.
 func DecryptETag(key crypto.ObjectKey, object ObjectInfo) (string, error) {
 	if n := strings.Count(object.ETag, "-"); n > 0 {
@@ -789,15 +789,15 @@ func DecryptETag(key crypto.ObjectKey, object ObjectInfo) (string, error) {
 	return hex.EncodeToString(etag), nil
 }
 
-// For encrypted objects, the ETag sent by client if available
-// is stored in encrypted form in the backend. Decrypt the ETag
-// if ETag was previously encrypted.
+// For encrypted objects, the Etag sent by client if available
+// is stored in encrypted form in the backend. Decrypt the Etag
+// if Etag was previously encrypted.
 func getDecryptedETag(headers http.Header, objInfo ObjectInfo, copySource bool) (decryptedETag string) {
 	var (
 		key [32]byte
 		err error
 	)
-	// If ETag is contentMD5Sum return it as is.
+	// If Etag is contentMD5Sum return it as is.
 	if len(objInfo.ETag) == 32 {
 		return objInfo.ETag
 	}
@@ -813,9 +813,9 @@ func getDecryptedETag(headers http.Header, objInfo ObjectInfo, copySource bool) 
 		}
 	}
 
-	// As per AWS S3 Spec, ETag for SSE-C encrypted objects need not be MD5Sum of the data.
-	// Since server side copy with same source and dest just replaces the ETag, we save
-	// encrypted content MD5Sum as ETag for both SSE-C and SSE-KMS, we standardize the ETag
+	// As per AWS S3 Spec, Etag for SSE-C encrypted objects need not be MD5Sum of the data.
+	// Since server side copy with same source and dest just replaces the Etag, we save
+	// encrypted content MD5Sum as Etag for both SSE-C and SSE-KMS, we standardize the Etag
 	// encryption across SSE-C and SSE-KMS, and only return last 32 bytes for SSE-C
 	if (crypto.SSEC.IsEncrypted(objInfo.UserDefined) || crypto.S3KMS.IsEncrypted(objInfo.UserDefined)) && !copySource {
 		return objInfo.ETag[len(objInfo.ETag)-32:]
@@ -828,9 +828,9 @@ func getDecryptedETag(headers http.Header, objInfo ObjectInfo, copySource bool) 
 	return tryDecryptETag(objectEncryptionKey, objInfo.ETag, true)
 }
 
-// helper to decrypt Etag given object encryption key and encrypted ETag
+// helper to decrypt Etag given object encryption key and encrypted Etag
 func tryDecryptETag(key []byte, encryptedETag string, sses3 bool) string {
-	// ETag for SSE-C or SSE-KMS encrypted objects need not be content MD5Sum.While encrypted
+	// Etag for SSE-C or SSE-KMS encrypted objects need not be content MD5Sum.While encrypted
 	// md5sum is stored internally, return just the last 32 bytes of hex-encoded and
 	// encrypted md5sum string for SSE-C
 	if !sses3 {

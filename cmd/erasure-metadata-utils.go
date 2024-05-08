@@ -191,7 +191,7 @@ func readAllFileInfo(ctx context.Context, disks []StorageAPI, bucket, object, ve
 }
 
 // shuffleDisksAndPartsMetadataByIndex this function should be always used by GetObjectNInfo()
-// and CompleteMultipartUpload code path, it is not meant to be used with PutObject,
+// and CompleteMultipartUpload code path, it is not meant to be used with PutObjectMeta,
 // NewMultipartUpload metadata shuffling.
 func shuffleDisksAndPartsMetadataByIndex(disks []StorageAPI, metaArr []FileInfo, fi FileInfo) (shuffledDisks []StorageAPI, shuffledPartsMetadata []FileInfo) {
 	shuffledDisks = make([]StorageAPI, len(disks))

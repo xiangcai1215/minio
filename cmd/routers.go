@@ -54,9 +54,11 @@ var globalMiddlewares = []mux.MiddlewareFunc{
 	// signatures.
 	//
 	// Validates all incoming requests to have a valid date header.
+	// 特别是签名算法的验证。例如对sign v4签名验证
 	setAuthMiddleware,
 	// Redirect some pre-defined browser request paths to a static location
 	// prefix.
+	// 重定向一些预定义的浏览器请求路径到一个静态的位置前缀
 	setBrowserRedirectMiddleware,
 	// Adds 'crossdomain.xml' policy middleware to serve legacy flash clients.
 	setCrossDomainPolicyMiddleware,

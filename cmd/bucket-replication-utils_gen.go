@@ -830,10 +830,10 @@ func (z *ReplicationState) DecodeMsg(dc *msgp.Reader) (err error) {
 				err = msgp.WrapError(err, "ReplicaStatus")
 				return
 			}
-		case "DeleteMarker":
+		case "IsDeleteMarker":
 			z.DeleteMarker, err = dc.ReadBool()
 			if err != nil {
-				err = msgp.WrapError(err, "DeleteMarker")
+				err = msgp.WrapError(err, "IsDeleteMarker")
 				return
 			}
 		case "ReplicationTimeStamp":
@@ -988,14 +988,14 @@ func (z *ReplicationState) EncodeMsg(en *msgp.Writer) (err error) {
 		err = msgp.WrapError(err, "ReplicaStatus")
 		return
 	}
-	// write "DeleteMarker"
+	// write "IsDeleteMarker"
 	err = en.Append(0xac, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x4d, 0x61, 0x72, 0x6b, 0x65, 0x72)
 	if err != nil {
 		return
 	}
 	err = en.WriteBool(z.DeleteMarker)
 	if err != nil {
-		err = msgp.WrapError(err, "DeleteMarker")
+		err = msgp.WrapError(err, "IsDeleteMarker")
 		return
 	}
 	// write "ReplicationTimeStamp"
@@ -1121,7 +1121,7 @@ func (z *ReplicationState) MarshalMsg(b []byte) (o []byte, err error) {
 		err = msgp.WrapError(err, "ReplicaStatus")
 		return
 	}
-	// string "DeleteMarker"
+	// string "IsDeleteMarker"
 	o = append(o, 0xac, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x4d, 0x61, 0x72, 0x6b, 0x65, 0x72)
 	o = msgp.AppendBool(o, z.DeleteMarker)
 	// string "ReplicationTimeStamp"
@@ -1194,10 +1194,10 @@ func (z *ReplicationState) UnmarshalMsg(bts []byte) (o []byte, err error) {
 				err = msgp.WrapError(err, "ReplicaStatus")
 				return
 			}
-		case "DeleteMarker":
+		case "IsDeleteMarker":
 			z.DeleteMarker, bts, err = msgp.ReadBoolBytes(bts)
 			if err != nil {
-				err = msgp.WrapError(err, "DeleteMarker")
+				err = msgp.WrapError(err, "IsDeleteMarker")
 				return
 			}
 		case "ReplicationTimeStamp":

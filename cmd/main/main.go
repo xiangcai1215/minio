@@ -65,14 +65,14 @@ type LifeCycle struct {
 
 type Rule struct {
 	XMLName xml.Name    `xml:"Rule"`
-	Expire  *Expiration `xml:"Expiration"`
+	Expire  *Expiration `xml:"LocalExpiration"`
 	Filter  *Filter     `xml:"Filter"`
 	ID      string      `xml:"ID"`
 	Status  string      `xml:"Status"`
 }
 
 type Expiration struct {
-	XMLName xml.Name  `xml:"Expiration"`
+	XMLName xml.Name  `xml:"LocalExpiration"`
 	Date    time.Time `xml:"Date,omitempty"`
 	Days    int       `xml:"Days,omitempty"`
 }

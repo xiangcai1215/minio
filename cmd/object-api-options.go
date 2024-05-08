@@ -204,6 +204,7 @@ func putOpts(ctx context.Context, r *http.Request, bucket, object string, metada
 	versioned := globalBucketVersioningSys.PrefixEnabled(bucket, object)
 	versionSuspended := globalBucketVersioningSys.PrefixSuspended(bucket, object)
 
+	// 上传对象时候为什么有VersionID的信息呢。
 	vid := strings.TrimSpace(r.Form.Get(xhttp.VersionID))
 	if vid != "" && vid != nullVersionID {
 		_, err := uuid.Parse(vid)

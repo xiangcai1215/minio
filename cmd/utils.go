@@ -538,18 +538,18 @@ func UTCNow() time.Time {
 	return time.Now().UTC()
 }
 
-// GenETag - generate UUID based ETag
+// GenETag - generate UUID based Etag
 func GenETag() string {
 	return ToS3ETag(getMD5Hash([]byte(mustGetUUID())))
 }
 
-// ToS3ETag - return checksum to ETag
+// ToS3ETag - return checksum to Etag
 func ToS3ETag(etag string) string {
 	etag = canonicalizeETag(etag)
 
 	if !strings.HasSuffix(etag, "-1") {
-		// Tools like s3cmd uses ETag as checksum of data to validate.
-		// Append "-1" to indicate ETag is not a checksum.
+		// Tools like s3cmd uses Etag as checksum of data to validate.
+		// Append "-1" to indicate Etag is not a checksum.
 		etag += "-1"
 	}
 

@@ -66,7 +66,7 @@ type ObjectOptions struct {
 	Expiration          ExpirationOptions
 	LifecycleAuditEvent lcAuditEvent
 
-	WantChecksum *hash.Checksum // x-amz-checksum-XXX checksum sent to PutObject/ CompleteMultipartUpload.
+	WantChecksum *hash.Checksum // x-amz-checksum-XXX checksum sent to PutObjectMeta/ CompleteMultipartUpload.
 
 	NoDecryption                        bool      // indicates if the stream must be decrypted.
 	PreserveETag                        string    // preserves this etag during a PUT call.
@@ -143,7 +143,7 @@ type DeleteBucketOptions struct {
 	SRDeleteOp SRBucketDeleteOp // only when site replication is enabled
 }
 
-// BucketOptions provides options for ListBuckets and GetBucketInfo call.
+// BucketOptions provides options for ListBuckets and GetBucket call.
 type BucketOptions struct {
 	Deleted bool // true only when site replication is enabled
 	Cached  bool // true only when we are requesting a cached response instead of hitting the disk for example ListBuckets() call.

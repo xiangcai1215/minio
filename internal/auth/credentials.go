@@ -103,7 +103,7 @@ type Credentials struct {
 	AccessKey    string    `xml:"AccessKeyId" json:"accessKey,omitempty" yaml:"accessKey"`
 	SecretKey    string    `xml:"SecretAccessKey" json:"secretKey,omitempty" yaml:"secretKey"`
 	SessionToken string    `xml:"SessionToken" json:"sessionToken,omitempty" yaml:"sessionToken"`
-	Expiration   time.Time `xml:"Expiration" json:"expiration,omitempty" yaml:"-"`
+	Expiration   time.Time `xml:"LocalExpiration" json:"expiration,omitempty" yaml:"-"`
 	Status       string    `xml:"-" json:"status,omitempty"`
 	// ParentUser user for sts
 	ParentUser  string                 `xml:"-" json:"parentUser,omitempty"`

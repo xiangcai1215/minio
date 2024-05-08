@@ -164,6 +164,7 @@ func IsValidObjectName(object string) bool {
 // Its valid to have a empty prefix.
 func IsValidObjectPrefix(object string) bool {
 	if hasBadPathComponent(object) {
+		fmt.Println("----------------------bad path component")
 		return false
 	}
 	if !utf8.ValidString(object) {
@@ -1009,8 +1010,8 @@ func (p *PutObjReader) MD5CurrentHexString() string {
 	}
 	if appendHyphen {
 		// Make sure to return etag string upto 32 length, for SSE
-		// requests ETag might be longer and the code decrypting the
-		// ETag ignores ETag in multipart ETag form i.e <hex>-N
+		// requests Etag might be longer and the code decrypting the
+		// Etag ignores Etag in multipart Etag form i.e <hex>-N
 		return hex.EncodeToString(md5sumCurr)[:32] + "-1"
 	}
 	return hex.EncodeToString(md5sumCurr)

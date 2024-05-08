@@ -187,11 +187,11 @@ func (s *TestSuiteIAM) TestSTSWithDenyDeleteVersion(c *check) {
     "Sid": "ObjectActionsRW",
     "Effect": "Allow",
     "Action": [
-     "s3:PutObject",
+     "s3:PutObjectMeta",
      "s3:PutObjectTagging",
      "s3:AbortMultipartUpload",
      "s3:DeleteObject",
-     "s3:GetObject",
+     "s3:GetObjectMeta",
      "s3:GetObjectTagging",
      "s3:GetObjectVersion",
      "s3:ListMultipartUploadParts"
@@ -281,7 +281,7 @@ func (s *TestSuiteIAM) TestSTSWithTags(c *check) {
   "Statement": [
     {
       "Effect":     "Allow",
-      "Action":     "s3:GetObject",
+      "Action":     "s3:GetObjectMeta",
       "Resource":    "arn:aws:s3:::%s/*",
       "Condition": {  "StringEquals": {"s3:ExistingObjectTag/security": "public" } }
     },
@@ -299,7 +299,7 @@ func (s *TestSuiteIAM) TestSTSWithTags(c *check) {
     {
       "Effect": "Allow",
       "Action": [
-        "s3:PutObject"
+        "s3:PutObjectMeta"
       ],
       "Resource": [
         "arn:aws:s3:::%s/*"
@@ -393,8 +393,8 @@ func (s *TestSuiteIAM) TestSTS(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta",
     "s3:ListBucket"
    ],
    "Resource": [
@@ -475,8 +475,8 @@ func (s *TestSuiteIAM) TestSTSWithGroupPolicy(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta",
     "s3:ListBucket"
    ],
    "Resource": [
@@ -708,8 +708,8 @@ func (s *TestSuiteIAM) TestLDAPSTS(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta",
     "s3:ListBucket"
    ],
    "Resource": [
@@ -841,8 +841,8 @@ func (s *TestSuiteIAM) TestLDAPSTSServiceAccounts(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta",
     "s3:ListBucket"
    ],
    "Resource": [
@@ -942,8 +942,8 @@ func (s *TestSuiteIAM) TestLDAPSTSServiceAccountsWithUsername(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta",
     "s3:ListBucket"
    ],
    "Resource": [
@@ -1033,8 +1033,8 @@ func (s *TestSuiteIAM) TestLDAPSTSServiceAccountsWithGroups(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta",
     "s3:ListBucket"
    ],
    "Resource": [
@@ -1152,8 +1152,8 @@ func (s *TestSuiteIAM) TestOpenIDSTS(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta",
     "s3:ListBucket"
    ],
    "Resource": [
@@ -1226,8 +1226,8 @@ func (s *TestSuiteIAM) TestOpenIDSTSAddUser(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta",
     "s3:ListBucket"
    ],
    "Resource": [
@@ -1316,8 +1316,8 @@ func (s *TestSuiteIAM) TestOpenIDServiceAcc(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta",
     "s3:ListBucket"
    ],
    "Resource": [
@@ -2107,8 +2107,8 @@ func (s *TestSuiteIAM) TestOpenIDServiceAccWithRolePolicyUnderAMP(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject"
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta"
    ],
    "Resource": [
     "arn:aws:s3:::%s/*"

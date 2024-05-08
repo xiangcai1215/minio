@@ -81,6 +81,7 @@ func getListObjectsV2Args(values url.Values) (prefix, token, startAfter, delimit
 
 	if values.Get("max-keys") != "" {
 		var err error
+		// 可以等于0
 		if maxkeys, err = strconv.Atoi(values.Get("max-keys")); err != nil {
 			errCode = ErrInvalidMaxKeys
 			return

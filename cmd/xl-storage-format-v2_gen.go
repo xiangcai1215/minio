@@ -1860,7 +1860,7 @@ func (z *xlMetaV2Version) DecodeMsg(dc *msgp.Reader) (err error) {
 			if dc.IsNil() {
 				err = dc.ReadNil()
 				if err != nil {
-					err = msgp.WrapError(err, "DeleteMarker")
+					err = msgp.WrapError(err, "IsDeleteMarker")
 					return
 				}
 				z.DeleteMarker = nil
@@ -1870,7 +1870,7 @@ func (z *xlMetaV2Version) DecodeMsg(dc *msgp.Reader) (err error) {
 				}
 				err = z.DeleteMarker.DecodeMsg(dc)
 				if err != nil {
-					err = msgp.WrapError(err, "DeleteMarker")
+					err = msgp.WrapError(err, "IsDeleteMarker")
 					return
 				}
 			}
@@ -1979,7 +1979,7 @@ func (z *xlMetaV2Version) EncodeMsg(en *msgp.Writer) (err error) {
 		} else {
 			err = z.DeleteMarker.EncodeMsg(en)
 			if err != nil {
-				err = msgp.WrapError(err, "DeleteMarker")
+				err = msgp.WrapError(err, "IsDeleteMarker")
 				return
 			}
 		}
@@ -2058,7 +2058,7 @@ func (z *xlMetaV2Version) MarshalMsg(b []byte) (o []byte, err error) {
 		} else {
 			o, err = z.DeleteMarker.MarshalMsg(o)
 			if err != nil {
-				err = msgp.WrapError(err, "DeleteMarker")
+				err = msgp.WrapError(err, "IsDeleteMarker")
 				return
 			}
 		}
@@ -2144,7 +2144,7 @@ func (z *xlMetaV2Version) UnmarshalMsg(bts []byte) (o []byte, err error) {
 				}
 				bts, err = z.DeleteMarker.UnmarshalMsg(bts)
 				if err != nil {
-					err = msgp.WrapError(err, "DeleteMarker")
+					err = msgp.WrapError(err, "IsDeleteMarker")
 					return
 				}
 			}

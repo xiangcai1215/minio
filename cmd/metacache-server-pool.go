@@ -88,7 +88,9 @@ func (z *erasureServerPools) listPath(ctx context.Context, o *listPathOptions) (
 
 	// If delimiter is slashSeparator we must return directories of
 	// the non-recursive scan unless explicitly requested.
-	o.IncludeDirectories = o.Separator == slashSeparator
+	// 如果分割符是""，o.Recursive设置为true
+	// o.IncludeDirectories为true
+	o.IncludeDirectories = o.Separator == slashSeparator // 为true
 	if (o.Separator == slashSeparator || o.Separator == "") && !o.Recursive {
 		o.Recursive = o.Separator != slashSeparator
 		o.Separator = slashSeparator

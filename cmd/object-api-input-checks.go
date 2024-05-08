@@ -169,7 +169,7 @@ func checkObjectArgs(ctx context.Context, bucket, object string, obj ObjectLayer
 	return nil
 }
 
-// Checks for PutObject arguments validity, also validates if bucket exists.
+// Checks for PutObjectMeta arguments validity, also validates if bucket exists.
 func checkPutObjectArgs(ctx context.Context, bucket, object string, obj getBucketInfoI) error {
 	// Verify if bucket exists before validating object name.
 	// This is done on purpose since the order of errors is

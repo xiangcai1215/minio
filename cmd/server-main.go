@@ -196,6 +196,7 @@ EXAMPLES:
 `,
 }
 
+// 通过环境变量来注册，对我们来说这个比较多，需要一个配置文件来解析
 func serverCmdArgs(ctx *cli.Context) []string {
 	v, _, _, err := env.LookupEnv(config.EnvArgs)
 	if err != nil {
@@ -542,6 +543,8 @@ func setGlobalInternodeInterface(interfaceName string) {
 //   - Returning 127.0.0.1 is necessary so Console will be able to send
 //     requests to the local S3 API.
 //   - The returned List needs to be deduplicated as well.
+//
+// 服务端需要感知s3api地址
 func getServerListenAddrs() []string {
 	// Use a string set to avoid duplication
 	addrs := set.NewStringSet()

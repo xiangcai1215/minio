@@ -50,7 +50,7 @@ type ReqInfo struct {
 	UserAgent    string           // User Agent
 	DeploymentID string           // x-minio-deployment-id
 	RequestID    string           // x-amz-request-id
-	API          string           // API name - GetObject PutObject NewMultipartUpload etc.
+	API          string           // API name - GetObjectMeta PutObjectMeta NewMultipartUpload etc.
 	BucketName   string           `json:",omitempty"` // Bucket name
 	ObjectName   string           `json:",omitempty"` // Object name
 	VersionID    string           `json:",omitempty"` // corresponding versionID for the object

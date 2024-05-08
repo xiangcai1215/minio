@@ -75,7 +75,7 @@ func TestPathTraversalExploit(t *testing.T) {
 		t.Skip()
 	}
 	defer DetectTestLeak(t)()
-	ExecExtendedObjectLayerAPITest(t, testPathTraversalExploit, []string{"PutObject"})
+	ExecExtendedObjectLayerAPITest(t, testPathTraversalExploit, []string{"PutObjectMeta"})
 }
 
 // testPathTraversal exploit test, exploits path traversal on windows

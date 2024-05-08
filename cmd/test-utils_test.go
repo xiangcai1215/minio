@@ -2031,6 +2031,8 @@ func registerAPIFunctions(muxRouter *mux.Router, objLayer ObjectLayer, apiFuncti
 		registerAPIRouter(muxRouter)
 		return
 	}
+
+	// 如果不适用默认的路由，这里只注册特定路由和处理函数，
 	// API Router.
 	apiRouter := muxRouter.PathPrefix(SlashSeparator).Subrouter()
 	// Bucket router.

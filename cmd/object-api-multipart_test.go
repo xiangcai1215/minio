@@ -1429,7 +1429,7 @@ func testListObjectPartsDiskNotFound(obj ObjectLayer, instanceType string, disks
 					if actualMetaData.Size != expectedResult.Parts[j].Size {
 						t.Errorf("Test %d: %s: Part %d: Expected Part Size to be \"%d\", but instead found \"%d\"", i+1, instanceType, j+1, expectedResult.Parts[j].Size, actualMetaData.Size)
 					}
-					//  Asserting the ETag in the PartInfo.
+					//  Asserting the Etag in the PartInfo.
 					if actualMetaData.ETag != expectedResult.Parts[j].ETag {
 						t.Errorf("Test %d: %s: Part %d: Expected Etag to be \"%s\", but instead found \"%s\"", i+1, instanceType, j+1, expectedResult.Parts[j].ETag, actualMetaData.ETag)
 					}
@@ -1670,7 +1670,7 @@ func testListObjectParts(obj ObjectLayer, instanceType string, t TestErrHandler)
 				if actualMetaData.Size != expectedResult.Parts[j].Size {
 					t.Errorf("Test %d: %s: Part %d: Expected Part Size to be \"%d\", but instead found \"%d\"", i+1, instanceType, j+1, expectedResult.Parts[j].Size, actualMetaData.Size)
 				}
-				//  Asserting the ETag in the PartInfo.
+				//  Asserting the Etag in the PartInfo.
 				if actualMetaData.ETag != expectedResult.Parts[j].ETag {
 					t.Errorf("Test %d: %s: Part %d: Expected Etag to be \"%s\", but instead found \"%s\"", i+1, instanceType, j+1, expectedResult.Parts[j].ETag, actualMetaData.ETag)
 				}
@@ -1748,7 +1748,7 @@ func testObjectCompleteMultipartUpload(obj ObjectLayer, instanceType string, t T
 		parts []CompletePart
 	}{
 		// inputParts - 0.
-		// Case for replicating ETag mismatch.
+		// Case for replicating Etag mismatch.
 		{
 			[]CompletePart{
 				{ETag: "abcd", PartNumber: 1},
@@ -1819,7 +1819,7 @@ func testObjectCompleteMultipartUpload(obj ObjectLayer, instanceType string, t T
 		{bucketNames[0], objectNames[0], uploadIDs[0], []CompletePart{{ETag: "abcz"}}, "", InvalidPart{}, false},
 		// Part number 0 doesn't exist, expecting InvalidPart error (Test number 12).
 		{bucketNames[0], objectNames[0], uploadIDs[0], []CompletePart{{ETag: "abcd", PartNumber: 0}}, "", InvalidPart{}, false},
-		// // Upload and PartNumber exists, But a deliberate ETag mismatch is introduced (Test number 13).
+		// // Upload and PartNumber exists, But a deliberate Etag mismatch is introduced (Test number 13).
 		{bucketNames[0], objectNames[0], uploadIDs[0], inputParts[0].parts, "", InvalidPart{}, false},
 		// Test case with non existent object name (Test number 14).
 		{bucketNames[0], "my-object", uploadIDs[0], []CompletePart{{ETag: "abcd", PartNumber: 1}}, "", InvalidUploadID{UploadID: uploadIDs[0]}, false},

@@ -2467,7 +2467,7 @@ func (s *xlStorage) RenameData(ctx context.Context, srcVolume, srcPath string, f
 	// null version and therefore don't require the free-version to track
 	// anything
 	if fi.VersionID == "" && !fi.IsRestoreObjReq() && !fi.Healing() {
-		// Note: Restore object request reuses PutObject/Multipart
+		// Note: Restore object request reuses PutObjectMeta/Multipart
 		// upload to copy back its data from the remote tier. This
 		// doesn't replace the existing version, so we don't need to add
 		// a free-version.
@@ -2524,7 +2524,7 @@ func (s *xlStorage) RenameData(ctx context.Context, srcVolume, srcPath string, f
 			s.moveToTrash(dstDataPath, true, false)
 			if healing {
 				// If we are healing we should purge any legacyDataPath content,
-				// that was previously preserved during PutObject() call
+				// that was previously preserved during PutObjectMeta() call
 				// on a versioned bucket.
 				s.moveToTrash(legacyDataPath, true, false)
 			}

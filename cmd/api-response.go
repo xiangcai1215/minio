@@ -263,7 +263,7 @@ type ObjectVersion struct {
 // MarshalXML - marshal ObjectVersion
 func (o ObjectVersion) MarshalXML(e *xxml.Encoder, start xxml.StartElement) error {
 	if o.isDeleteMarker {
-		start.Name.Local = "DeleteMarker"
+		start.Name.Local = "IsDeleteMarker"
 	} else {
 		start.Name.Local = "Version"
 	}
@@ -462,8 +462,9 @@ func getObjectLocation(r *http.Request, domains []string, bucket, object string)
 	}
 	proto := handlers.GetSourceScheme(r)
 	if proto == "" {
-		proto = getURLScheme(globalIsTLS)
+		proto = getURLScheme(r.TLS != nil)
 	}
+
 	u := &url.URL{
 		Host:   r.Host,
 		Path:   path.Join(SlashSeparator, bucket, object),
@@ -519,6 +520,7 @@ func generateListVersionsResponse(bucket, prefix, marker, versionIDMarker, delim
 			continue
 		}
 		// Cache checks for the same object
+		// 如果需要获取是否有获取tagging 的action，并且上一个对象的名字和当前对象的名字不一样，那么就获取tagging
 		if metadata != nil && lastObjMetaName != object.Name {
 			tagErr = metadata(object.Name, policy.GetObjectTaggingAction)
 			metaErr = metadata(object.Name, policy.GetObjectAction)
@@ -762,14 +764,14 @@ func generateInitiateMultipartUploadResponse(bucket, key, uploadID string) Initi
 	}
 }
 
-// generates CompleteMultipartUploadResponse for given bucket, key, location and ETag.
+// generates CompleteMultipartUploadResponse for given bucket, key, location and Etag.
 func generateCompleteMultpartUploadResponse(bucket, key, location string, oi ObjectInfo) CompleteMultipartUploadResponse {
 	cs := oi.decryptChecksums(0)
 	c := CompleteMultipartUploadResponse{
 		Location: location,
 		Bucket:   bucket,
 		Key:      key,
-		// AWS S3 quotes the ETag in XML, make sure we are compatible here.
+		// AWS S3 quotes the Etag in XML, make sure we are compatible here.
 		ETag:           "\"" + oi.ETag + "\"",
 		ChecksumSHA1:   cs[hash.ChecksumSHA1.String()],
 		ChecksumSHA256: cs[hash.ChecksumSHA256.String()],

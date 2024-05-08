@@ -250,31 +250,31 @@ func TestReplicate(t *testing.T) {
 		{ObjectOpts{Name: "c1test"}, cfgs[0], true},                   // 2. valid ObjectOpts passing empty Filter
 		{ObjectOpts{Name: "c1test", VersionID: "vid"}, cfgs[0], true}, // 3. valid ObjectOpts passing empty Filter
 
-		{ObjectOpts{Name: "c1test", DeleteMarker: true, OpType: DeleteReplicationType}, cfgs[0], true},                                // 4. DeleteMarker version replication valid case - matches DeleteMarkerReplication status
+		{ObjectOpts{Name: "c1test", DeleteMarker: true, OpType: DeleteReplicationType}, cfgs[0], true},                                // 4. IsDeleteMarker version replication valid case - matches DeleteMarkerReplication status
 		{ObjectOpts{Name: "c1test", VersionID: "vid", OpType: DeleteReplicationType}, cfgs[0], true},                                  // 5. permanent delete of version, matches DeleteReplication status - valid case
 		{ObjectOpts{Name: "c1test", VersionID: "vid", DeleteMarker: true, OpType: DeleteReplicationType}, cfgs[0], true},              // 6. permanent delete of version, matches DeleteReplication status
 		{ObjectOpts{Name: "c1test", VersionID: "vid", DeleteMarker: true, SSEC: true, OpType: DeleteReplicationType}, cfgs[0], false}, // 7. permanent delete of version, disqualified by SSE-C
-		{ObjectOpts{Name: "c1test", DeleteMarker: true, SSEC: true, OpType: DeleteReplicationType}, cfgs[0], false},                   // 8. setting DeleteMarker on SSE-C encrypted object, disqualified by SSE-C
+		{ObjectOpts{Name: "c1test", DeleteMarker: true, SSEC: true, OpType: DeleteReplicationType}, cfgs[0], false},                   // 8. setting IsDeleteMarker on SSE-C encrypted object, disqualified by SSE-C
 		{ObjectOpts{Name: "c1test", SSEC: true}, cfgs[0], false},                                                                      // 9. replication of SSE-C encrypted object, disqualified
 
 		//  using config 2 - no filters, only replication of object, metadata enabled
 		{ObjectOpts{Name: "c2test"}, cfgs[1], true},                                                                                   // 10. valid ObjectOpts passing empty Filter
-		{ObjectOpts{Name: "c2test", DeleteMarker: true, OpType: DeleteReplicationType}, cfgs[1], false},                               // 11. DeleteMarker version replication  not allowed due to DeleteMarkerReplication status
+		{ObjectOpts{Name: "c2test", DeleteMarker: true, OpType: DeleteReplicationType}, cfgs[1], false},                               // 11. IsDeleteMarker version replication  not allowed due to DeleteMarkerReplication status
 		{ObjectOpts{Name: "c2test", VersionID: "vid", OpType: DeleteReplicationType}, cfgs[1], false},                                 // 12. permanent delete of version, disallowed by DeleteReplication status
-		{ObjectOpts{Name: "c2test", VersionID: "vid", DeleteMarker: true, OpType: DeleteReplicationType}, cfgs[1], false},             // 13. permanent delete of DeleteMarker version, disallowed by DeleteReplication status
+		{ObjectOpts{Name: "c2test", VersionID: "vid", DeleteMarker: true, OpType: DeleteReplicationType}, cfgs[1], false},             // 13. permanent delete of IsDeleteMarker version, disallowed by DeleteReplication status
 		{ObjectOpts{Name: "c2test", VersionID: "vid", DeleteMarker: true, SSEC: true, OpType: DeleteReplicationType}, cfgs[1], false}, // 14. permanent delete of version, disqualified by SSE-C & DeleteReplication status
-		{ObjectOpts{Name: "c2test", DeleteMarker: true, SSEC: true, OpType: DeleteReplicationType}, cfgs[1], false},                   // 15. setting DeleteMarker on SSE-C encrypted object, disqualified by SSE-C & DeleteMarkerReplication status
+		{ObjectOpts{Name: "c2test", DeleteMarker: true, SSEC: true, OpType: DeleteReplicationType}, cfgs[1], false},                   // 15. setting IsDeleteMarker on SSE-C encrypted object, disqualified by SSE-C & DeleteMarkerReplication status
 		{ObjectOpts{Name: "c2test", SSEC: true}, cfgs[1], false},                                                                      // 16. replication of SSE-C encrypted object, disqualified by default
 		// using config 2 - has more than one rule with overlapping prefixes
 		{ObjectOpts{Name: "xy/c3test", UserTags: "k1=v1"}, cfgs[2], true},                                                                       // 17. matches rule 1 for replication of content/metadata
 		{ObjectOpts{Name: "xyz/c3test", UserTags: "k1=v1"}, cfgs[2], true},                                                                      // 18. matches rule 1 for replication of content/metadata
-		{ObjectOpts{Name: "xyz/c3test", UserTags: "k1=v1", DeleteMarker: true, OpType: DeleteReplicationType}, cfgs[2], false},                  // 19. matches rule 1 - DeleteMarker replication disallowed by rule
-		{ObjectOpts{Name: "xyz/c3test", UserTags: "k1=v1", DeleteMarker: true, VersionID: "vid", OpType: DeleteReplicationType}, cfgs[2], true}, // 20. matches rule 1 - DeleteReplication allowed by rule for permanent delete of DeleteMarker
+		{ObjectOpts{Name: "xyz/c3test", UserTags: "k1=v1", DeleteMarker: true, OpType: DeleteReplicationType}, cfgs[2], false},                  // 19. matches rule 1 - IsDeleteMarker replication disallowed by rule
+		{ObjectOpts{Name: "xyz/c3test", UserTags: "k1=v1", DeleteMarker: true, VersionID: "vid", OpType: DeleteReplicationType}, cfgs[2], true}, // 20. matches rule 1 - DeleteReplication allowed by rule for permanent delete of IsDeleteMarker
 		{ObjectOpts{Name: "xyz/c3test", UserTags: "k1=v1", VersionID: "vid", OpType: DeleteReplicationType}, cfgs[2], true},                     // 21. matches rule 1 - DeleteReplication allowed by rule for permanent delete of version
 		{ObjectOpts{Name: "xyz/c3test"}, cfgs[2], true},                                                                                         // 22. matches rule 2 for replication of content/metadata
 		{ObjectOpts{Name: "xy/c3test", UserTags: "k1=v2"}, cfgs[2], false},                                                                      // 23. does not match rule1 because tag value does not pass filter
-		{ObjectOpts{Name: "xyz/c3test", DeleteMarker: true, OpType: DeleteReplicationType}, cfgs[2], true},                                      // 24. matches rule 2 - DeleteMarker replication allowed by rule
-		{ObjectOpts{Name: "xyz/c3test", DeleteMarker: true, VersionID: "vid", OpType: DeleteReplicationType}, cfgs[2], false},                   // 25. matches rule 2 - DeleteReplication disallowed by rule for permanent delete of DeleteMarker
+		{ObjectOpts{Name: "xyz/c3test", DeleteMarker: true, OpType: DeleteReplicationType}, cfgs[2], true},                                      // 24. matches rule 2 - IsDeleteMarker replication allowed by rule
+		{ObjectOpts{Name: "xyz/c3test", DeleteMarker: true, VersionID: "vid", OpType: DeleteReplicationType}, cfgs[2], false},                   // 25. matches rule 2 - DeleteReplication disallowed by rule for permanent delete of IsDeleteMarker
 		{ObjectOpts{Name: "xyz/c3test", VersionID: "vid", OpType: DeleteReplicationType}, cfgs[2], false},                                       // 26. matches rule 1 - DeleteReplication disallowed by rule for permanent delete of version
 		{ObjectOpts{Name: "abc/c3test"}, cfgs[2], false},                                                                                        // 27. matches no rule because object prefix does not match
 
@@ -282,13 +282,13 @@ func TestReplicate(t *testing.T) {
 		{ObjectOpts{Name: "xy/c4test", UserTags: "k1=v1"}, cfgs[3], true},                                                                       // 28. matches rule 1 for replication of content/metadata
 		{ObjectOpts{Name: "xa/c4test", UserTags: "k1=v1"}, cfgs[3], false},                                                                      // 29. no rule match object prefix not in rules
 		{ObjectOpts{Name: "xyz/c4test", DeleteMarker: true, OpType: DeleteReplicationType}, cfgs[3], false},                                     // 30. rule 1 not matched because of tags filter
-		{ObjectOpts{Name: "xyz/c4test", UserTags: "k1=v1", DeleteMarker: true, OpType: DeleteReplicationType}, cfgs[3], false},                  // 31. matches rule 1 - DeleteMarker replication disallowed by rule
-		{ObjectOpts{Name: "xyz/c4test", UserTags: "k1=v1", DeleteMarker: true, VersionID: "vid", OpType: DeleteReplicationType}, cfgs[3], true}, // 32. matches rule 1 - DeleteReplication allowed by rule for permanent delete of DeleteMarker
+		{ObjectOpts{Name: "xyz/c4test", UserTags: "k1=v1", DeleteMarker: true, OpType: DeleteReplicationType}, cfgs[3], false},                  // 31. matches rule 1 - IsDeleteMarker replication disallowed by rule
+		{ObjectOpts{Name: "xyz/c4test", UserTags: "k1=v1", DeleteMarker: true, VersionID: "vid", OpType: DeleteReplicationType}, cfgs[3], true}, // 32. matches rule 1 - DeleteReplication allowed by rule for permanent delete of IsDeleteMarker
 		{ObjectOpts{Name: "xyz/c4test", UserTags: "k1=v1", VersionID: "vid", OpType: DeleteReplicationType}, cfgs[3], true},                     // 33. matches rule 1 - DeleteReplication allowed by rule for permanent delete of version
 		{ObjectOpts{Name: "abc/c4test"}, cfgs[3], true},                                                                                         // 34. matches rule 2 for replication of content/metadata
 		{ObjectOpts{Name: "abc/c4test", UserTags: "k1=v2"}, cfgs[3], true},                                                                      // 35. matches rule 2 for replication of content/metadata
-		{ObjectOpts{Name: "abc/c4test", DeleteMarker: true, OpType: DeleteReplicationType}, cfgs[3], true},                                      // 36. matches rule 2 - DeleteMarker replication allowed by rule
-		{ObjectOpts{Name: "abc/c4test", DeleteMarker: true, VersionID: "vid", OpType: DeleteReplicationType}, cfgs[3], false},                   // 37. matches rule 2 - DeleteReplication disallowed by rule for permanent delete of DeleteMarker
+		{ObjectOpts{Name: "abc/c4test", DeleteMarker: true, OpType: DeleteReplicationType}, cfgs[3], true},                                      // 36. matches rule 2 - IsDeleteMarker replication allowed by rule
+		{ObjectOpts{Name: "abc/c4test", DeleteMarker: true, VersionID: "vid", OpType: DeleteReplicationType}, cfgs[3], false},                   // 37. matches rule 2 - DeleteReplication disallowed by rule for permanent delete of IsDeleteMarker
 		{ObjectOpts{Name: "abc/c4test", VersionID: "vid", OpType: DeleteReplicationType}, cfgs[3], false},                                       // 38. matches rule 2 - DeleteReplication disallowed by rule for permanent delete of version
 		//  using config 4 - with replica modification sync disabled.
 		{ObjectOpts{Name: "xy/c5test", UserTags: "k1=v1", Replica: true}, cfgs[4], false}, // 39. replica syncing disabled, this object is a replica

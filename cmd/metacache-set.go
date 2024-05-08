@@ -196,6 +196,8 @@ func (o *listPathOptions) gatherResults(ctx context.Context, in <-chan metaCache
 				resCh = nil
 				continue
 			}
+			// 当delimiter为/,o.IncludeDirectories是true，表示返回的结果中包含目录
+			fmt.Println("entry:", entry.name, "isDir:", entry.isDir(), "isObjectDir:", entry.isObjectDir(), o.IncludeDirectories, o.Separator, o.Prefix)
 			if !o.IncludeDirectories && (entry.isDir() || (!o.Versioned && entry.isObjectDir() && entry.isLatestDeletemarker())) {
 				continue
 			}

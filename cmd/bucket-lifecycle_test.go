@@ -229,7 +229,7 @@ func TestValidateTransitionTier(t *testing.T) {
 		},
 		{
 			// no transition rule
-			xml:         []byte(`<LifecycleConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Rule><ID>rule</ID><Prefix /><Status>Enabled</Status><Expiration><Days>1</Days></Expiration></Rule></LifecycleConfiguration>`),
+			xml:         []byte(`<LifecycleConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Rule><ID>rule</ID><Prefix /><Status>Enabled</Status><LocalExpiration><Days>1</Days></LocalExpiration></Rule></LifecycleConfiguration>`),
 			expectedErr: nil,
 		},
 	}

@@ -272,10 +272,10 @@ func registerAPIRouter(router *mux.Router) {
 		// GetObjectLegalHold
 		router.Methods(http.MethodGet).Path("/{object:.+}").HandlerFunc(
 			collectAPIStats("getobjectlegalhold", maxClients(gz(httpTraceAll(api.GetObjectLegalHoldHandler))))).Queries("legal-hold", "")
-		// GetObject with lambda ARNs
+		// GetObjectMeta with lambda ARNs
 		router.Methods(http.MethodGet).Path("/{object:.+}").HandlerFunc(
 			collectAPIStats("getobject", maxClients(gz(httpTraceHdrs(api.GetObjectLambdaHandler))))).Queries("lambdaArn", "{lambdaArn:.*}")
-		// GetObject
+		// GetObjectMeta
 		router.Methods(http.MethodGet).Path("/{object:.+}").HandlerFunc(
 			collectAPIStats("getobject", maxClients(gz(httpTraceHdrs(api.GetObjectHandler)))))
 		// CopyObject
@@ -288,11 +288,11 @@ func registerAPIRouter(router *mux.Router) {
 		router.Methods(http.MethodPut).Path("/{object:.+}").HandlerFunc(
 			collectAPIStats("putobjectlegalhold", maxClients(gz(httpTraceAll(api.PutObjectLegalHoldHandler))))).Queries("legal-hold", "")
 
-		// PutObject with auto-extract support for zip
+		// PutObjectMeta with auto-extract support for zip
 		router.Methods(http.MethodPut).Path("/{object:.+}").HeadersRegexp(xhttp.AmzSnowballExtract, "true").HandlerFunc(
 			collectAPIStats("putobject", maxClients(gz(httpTraceHdrs(api.PutObjectExtractHandler)))))
 
-		// PutObject
+		// PutObjectMeta
 		router.Methods(http.MethodPut).Path("/{object:.+}").HandlerFunc(
 			collectAPIStats("putobject", maxClients(gz(httpTraceHdrs(api.PutObjectHandler)))))
 
@@ -417,7 +417,7 @@ func registerAPIRouter(router *mux.Router) {
 		router.Methods(http.MethodPut).HandlerFunc(
 			collectAPIStats("resetbucketreplicationstart", maxClients(gz(httpTraceAll(api.ResetBucketReplicationStartHandler))))).Queries("replication-reset", "")
 
-		// PutBucket
+		// PutBucketName
 		router.Methods(http.MethodPut).HandlerFunc(
 			collectAPIStats("putbucket", maxClients(gz(httpTraceAll(api.PutBucketHandler)))))
 		// HeadBucket

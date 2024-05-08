@@ -412,7 +412,7 @@ func (api objectAPIHandlers) CopyObjectPartHandler(w http.ResponseWriter, r *htt
 			return
 		}
 
-		// Send PutObject request to appropriate instance (in federated deployment)
+		// Send PutObjectMeta request to appropriate instance (in federated deployment)
 		core, rerr := getRemoteInstanceClient(r, getHostFromSrv(dstRecords))
 		if rerr != nil {
 			writeErrorResponse(ctx, w, toAPIError(ctx, rerr), r.URL)
@@ -845,8 +845,8 @@ func (api objectAPIHandlers) PutObjectPartHandler(w http.ResponseWriter, r *http
 	}
 
 	// We must not use the http.Header().Set method here because some (broken)
-	// clients expect the ETag header key to be literally "ETag" - not "Etag" (case-sensitive).
-	// Therefore, we have to set the ETag directly as map entry.
+	// clients expect the Etag header key to be literally "Etag" - not "Etag" (case-sensitive).
+	// Therefore, we have to set the Etag directly as map entry.
 	w.Header()[xhttp.ETag] = []string{"\"" + etag + "\""}
 	hash.TransferChecksumHeader(w, r)
 
@@ -943,13 +943,13 @@ func (api objectAPIHandlers) CompleteMultipartUploadHandler(w http.ResponseWrite
 	opts.Versioned = versioned
 	opts.VersionSuspended = suspended
 
-	// First, we compute the ETag of the multipart object.
-	// The ETag of a multi-part object is always:
-	//   ETag := MD5(ETag_p1, ETag_p2, ...)+"-N"   (N being the number of parts)
+	// First, we compute the Etag of the multipart object.
+	// The Etag of a multi-part object is always:
+	//   Etag := MD5(ETag_p1, ETag_p2, ...)+"-N"   (N being the number of parts)
 	//
 	// This is independent of encryption. An encrypted multipart
-	// object also has an ETag that is the MD5 of its part ETags.
-	// The fact the in case of encryption the ETag of a part is
+	// object also has an Etag that is the MD5 of its part ETags.
+	// The fact the in case of encryption the Etag of a part is
 	// not the MD5 of the part content does not change that.
 	var completeETags []etag.ETag
 	for _, part := range complMultipartUpload.Parts {
@@ -1118,7 +1118,7 @@ func (api objectAPIHandlers) ListObjectPartsHandler(w http.ResponseWriter, r *ht
 	// We have to adjust the size of encrypted parts since encrypted parts
 	// are slightly larger due to encryption overhead.
 	// Further, we have to adjust the ETags of parts when using SSE-S3.
-	// Due to AWS S3, SSE-S3 encrypted parts return the plaintext ETag
+	// Due to AWS S3, SSE-S3 encrypted parts return the plaintext Etag
 	// being the content MD5 of that particular part. This is not the
 	// case for SSE-C and SSE-KMS objects.
 	if kind, ok := crypto.IsEncrypted(listPartsInfo.UserDefined); ok {

@@ -1185,7 +1185,7 @@ func (z *erasureServerPools) CopyObject(ctx context.Context, srcBucket, srcObjec
 		// Destination is versioned, source is not destination version,
 		// as a special case look for if the source object is not legacy
 		// from older format, for older format we will rewrite them as
-		// newer using PutObject() - this is an optimization to save space
+		// newer using PutObjectMeta() - this is an optimization to save space
 		if dstOpts.Versioned && srcOpts.VersionID != dstOpts.VersionID && !srcInfo.Legacy {
 			// CopyObject optimization where we don't create an entire copy
 			// of the content, instead we add a reference.
@@ -1321,9 +1321,10 @@ func maxKeysPlusOne(maxKeys int, addOne bool) int {
 func (z *erasureServerPools) ListObjects(ctx context.Context, bucket, prefix, marker, delimiter string, maxKeys int) (ListObjectsInfo, error) {
 	var loi ListObjectsInfo
 	opts := listPathOptions{
-		Bucket:      bucket,
-		Prefix:      prefix,
-		Separator:   delimiter,
+		Bucket:    bucket,
+		Prefix:    prefix,
+		Separator: delimiter, // 区别在这个字段，
+		// marker设置，会增加1
 		Limit:       maxKeysPlusOne(maxKeys, marker != ""),
 		Marker:      marker,
 		InclDeleted: false,
@@ -1396,6 +1397,7 @@ func (z *erasureServerPools) ListObjects(ctx context.Context, bucket, prefix, ma
 		// }
 		objInfo, err := z.GetObjectInfo(ctx, bucket, path.Dir(prefix), ObjectOptions{NoLock: true})
 		if err == nil {
+			fmt.Println("objInfo:-----------------", objInfo.Name)
 			if opts.Lifecycle != nil {
 				evt := evalActionFromLifecycle(ctx, *opts.Lifecycle, opts.Retention, opts.Replication.Config, objInfo)
 				if evt.Action.Delete() {
@@ -1439,29 +1441,38 @@ func (z *erasureServerPools) ListObjects(ctx context.Context, bucket, prefix, ma
 		}
 	}
 
+	// 如果opts.limit为0，则会返EOF错误，此时loi是空的
+	// 这里如果设置了Marker，结果就已经过滤了"Asia/India/Karnataka/Bangalore/Koramangala/pics"
 	merged, err := z.listPath(ctx, &opts)
+
 	if err != nil && err != io.EOF {
 		if !isErrBucketNotFound(err) {
 			logger.LogOnceIf(ctx, err, "erasure-list-objects-path-"+bucket)
 		}
 		return loi, err
 	}
-
+	fmt.Println("merged.entries():-----------------", len(merged.entries()), merged.entries())
 	merged.forwardPast(opts.Marker)
 	defer merged.truncate(0) // Release when returning
 
 	if contextCanceled(ctx) {
 		return ListObjectsInfo{}, ctx.Err()
 	}
-
 	// Default is recursive, if delimiter is set then list non recursive.
+	// 明确给出Object是dir，就是common prefix.
 	objects := merged.fileInfos(bucket, prefix, delimiter)
+	fmt.Println("objects:---------------", len(objects))
+	for _, obj := range objects {
+		fmt.Printf("obj.Name:-----------------%+v \n", obj)
+	}
+
 	loi.IsTruncated = err == nil && len(objects) > 0
 	if maxKeys > 0 && len(objects) > maxKeys {
 		objects = objects[:maxKeys]
 		loi.IsTruncated = true
 	}
 	for _, obj := range objects {
+		// 如果是delimiter不为空时候，这里isDir为true，会进入下面逻辑
 		if obj.IsDir && obj.ModTime.IsZero() && delimiter != "" {
 			// Only add each once.
 			// With slash delimiter we only get the directory once.
@@ -1474,7 +1485,9 @@ func (z *erasureServerPools) ListObjects(ctx context.Context, bucket, prefix, ma
 					found = p == obj.Name
 				}
 			}
+			// 如果是一个新的前缀，这里就会返回新prefixes
 			if !found {
+				// obj.Name是一个公共前缀
 				loi.Prefixes = append(loi.Prefixes, obj.Name)
 			}
 		} else {
@@ -1699,6 +1712,7 @@ func (z *erasureServerPools) AbortMultipartUpload(ctx context.Context, bucket, o
 // CompleteMultipartUpload - completes a pending multipart transaction, on hashedSet based on object name.
 func (z *erasureServerPools) CompleteMultipartUpload(ctx context.Context, bucket, object, uploadID string, uploadedParts []CompletePart, opts ObjectOptions) (objInfo ObjectInfo, err error) {
 	if err = checkCompleteMultipartArgs(ctx, bucket, object, uploadID, z); err != nil {
+		fmt.Println("----checkCompleteMultipartArgs err:-----------------", err)
 		return objInfo, err
 	}
 

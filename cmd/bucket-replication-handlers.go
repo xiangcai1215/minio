@@ -606,7 +606,7 @@ func (api objectAPIHandlers) ValidateBucketReplicationCredsHandler(w http.Respon
 		}
 
 		reader := bytes.NewReader(buf)
-		// fake a PutObject and RemoveObject call to validate permissions
+		// fake a PutObjectMeta and RemoveObject call to validate permissions
 		c := &minio.Core{Client: clnt.Client}
 		putOpts := minio.PutObjectOptions{
 			Internal: minio.AdvancedPutOptions{

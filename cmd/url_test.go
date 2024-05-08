@@ -30,7 +30,7 @@ func BenchmarkURLQueryForm(b *testing.B) {
 
 	// benchmark utility which helps obtain number of allocations and bytes allocated per ops.
 	b.ReportAllocs()
-	// the actual benchmark for PutObject starts here. Reset the benchmark timer.
+	// the actual benchmark for PutObjectMeta starts here. Reset the benchmark timer.
 	b.ResetTimer()
 
 	if err := req.ParseForm(); err != nil {
@@ -56,7 +56,7 @@ func BenchmarkURLQuery(b *testing.B) {
 
 	// benchmark utility which helps obtain number of allocations and bytes allocated per ops.
 	b.ReportAllocs()
-	// the actual benchmark for PutObject starts here. Reset the benchmark timer.
+	// the actual benchmark for PutObjectMeta starts here. Reset the benchmark timer.
 	b.ResetTimer()
 
 	b.RunParallel(func(pb *testing.PB) {

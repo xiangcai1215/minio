@@ -88,6 +88,7 @@ func (p *parallelReader) preferReaders(prefer []bool) {
 }
 
 // Returns if buf can be erasure decoded.
+// 这里是只要并发读多个数据后，只要满足n个数据块就能解码。
 func (p *parallelReader) canDecode(buf [][]byte) bool {
 	bufCount := 0
 	for _, b := range buf {
@@ -99,6 +100,7 @@ func (p *parallelReader) canDecode(buf [][]byte) bool {
 }
 
 // Read reads from readers in parallel. Returns p.dataBlocks number of bufs.
+// 这里并发读场景和分片场景还是不一样，分片需要数据是连续的，这里可以不连续。
 func (p *parallelReader) Read(dst [][]byte) ([][]byte, error) {
 	newBuf := dst
 	if len(dst) != len(p.readers) {
@@ -223,6 +225,7 @@ func (e Erasure) Decode(ctx context.Context, writer io.Writer, readers []io.Read
 	}
 
 	reader := newParallelReader(readers, e, offset, totalLength)
+	// prefer是一个单机策略，可以优先读本地节点的数据。
 	if len(prefer) == len(readers) {
 		reader.preferReaders(prefer)
 	}

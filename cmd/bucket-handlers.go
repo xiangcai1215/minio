@@ -301,7 +301,6 @@ func (api objectAPIHandlers) ListMultipartUploadsHandler(w http.ResponseWriter, 
 // owned by the authenticated sender of the request.
 func (api objectAPIHandlers) ListBucketsHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := newContext(r, w, "ListBuckets")
-
 	defer logger.AuditLog(ctx, w, r, mustGetClaimsFromToken(r))
 
 	objectAPI := api.ObjectAPI()
@@ -354,7 +353,7 @@ func (api objectAPIHandlers) ListBucketsHandler(w http.ResponseWriter, r *http.R
 			return
 		}
 	}
-
+	// 为什么这里出错了，还会返回自己的buckets
 	if s3Error == ErrAccessDenied {
 		// Set prefix value for "s3:prefix" policy conditionals.
 		r.Header.Set("prefix", "")
@@ -462,8 +461,8 @@ func (api objectAPIHandlers) DeleteMultipleObjectsHandler(w http.ResponseWriter,
 	// Make sure to update context to print ObjectNames for multi objects.
 	ctx = updateReqContext(ctx, objects...)
 
-	// Call checkRequestAuthType to populate ReqInfo.AccessKey before GetBucketInfo()
-	// Ignore errors here to preserve the S3 error behavior of GetBucketInfo()
+	// Call checkRequestAuthType to populate ReqInfo.AccessKey before GetBucket()
+	// Ignore errors here to preserve the S3 error behavior of GetBucket()
 	checkRequestAuthType(ctx, r, policy.DeleteObjectAction, bucket, "")
 
 	// Before proceeding validate if bucket exists.
@@ -613,7 +612,7 @@ func (api objectAPIHandlers) DeleteMultipleObjectsHandler(w http.ResponseWriter,
 	for i := range errs {
 		// DeleteMarkerVersionID is not used specifically to avoid
 		// lookup errors, since DeleteMarkerVersionID is only
-		// created during DeleteMarker creation when client didn't
+		// created during IsDeleteMarker creation when client didn't
 		// specify a versionID.
 		objToDel := ObjectToDelete{
 			ObjectV: ObjectV{
@@ -719,7 +718,7 @@ func (api objectAPIHandlers) DeleteMultipleObjectsHandler(w http.ResponseWriter,
 // This implementation of the PUT operation creates a new bucket for authenticated request
 // 如果保存bucket的owner
 func (api objectAPIHandlers) PutBucketHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := newContext(r, w, "PutBucket")
+	ctx := newContext(r, w, "PutBucketName")
 
 	defer logger.AuditLog(ctx, w, r, mustGetClaimsFromToken(r))
 
@@ -757,6 +756,7 @@ func (api objectAPIHandlers) PutBucketHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	// 这里owner还是判断是不是minioadmin
+	// 在IAM系统的鉴权用到了
 	cred, owner, s3Error := checkRequestAuthTypeCredential(ctx, r, policy.CreateBucketAction)
 	if s3Error != ErrNone {
 		writeErrorResponse(ctx, w, errorCodes.ToAPIErr(s3Error), r.URL)
@@ -1403,8 +1403,8 @@ func (api objectAPIHandlers) PostPolicyBucketHandler(w http.ResponseWriter, r *h
 	}
 
 	// We must not use the http.Header().Set method here because some (broken)
-	// clients expect the ETag header key to be literally "ETag" - not "Etag" (case-sensitive).
-	// Therefore, we have to set the ETag directly as map entry.
+	// clients expect the Etag header key to be literally "Etag" - not "Etag" (case-sensitive).
+	// Therefore, we have to set the Etag directly as map entry.
 	w.Header()[xhttp.ETag] = []string{`"` + objInfo.ETag + `"`}
 
 	// Set the relevant version ID as part of the response header.

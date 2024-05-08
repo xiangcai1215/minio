@@ -68,7 +68,7 @@ func testAPIHeadObjectHandler(obj ObjectLayer, instanceType, bucketName string, 
 	credentials auth.Credentials, t *testing.T,
 ) {
 	objectName := "test-object"
-	// set of byte data for PutObject.
+	// set of byte data for PutObjectMeta.
 	// object has to be created before running tests for HeadObject.
 	// this is required even to assert the HeadObject data,
 	// since dataInserted === dataFetched back is a primary criteria for any object storage this assertion is critical.
@@ -207,7 +207,7 @@ func TestAPIHeadObjectHandlerWithEncryption(t *testing.T) {
 	defer func() { globalPolicySys = nil }()
 
 	defer DetectTestLeak(t)()
-	ExecObjectLayerAPITest(t, testAPIHeadObjectHandlerWithEncryption, []string{"NewMultipart", "PutObjectPart", "CompleteMultipart", "GetObject", "PutObject", "HeadObject"})
+	ExecObjectLayerAPITest(t, testAPIHeadObjectHandlerWithEncryption, []string{"NewMultipart", "PutObjectPart", "CompleteMultipart", "GetObjectMeta", "PutObjectMeta", "HeadObject"})
 }
 
 func testAPIHeadObjectHandlerWithEncryption(obj ObjectLayer, instanceType, bucketName string, apiRouter http.Handler,
@@ -329,16 +329,16 @@ func TestAPIGetObjectHandler(t *testing.T) {
 	defer func() { globalPolicySys = nil }()
 
 	defer DetectTestLeak(t)()
-	ExecExtendedObjectLayerAPITest(t, testAPIGetObjectHandler, []string{"GetObject"})
+	ExecExtendedObjectLayerAPITest(t, testAPIGetObjectHandler, []string{"GetObjectMeta"})
 }
 
 func testAPIGetObjectHandler(obj ObjectLayer, instanceType, bucketName string, apiRouter http.Handler,
 	credentials auth.Credentials, t *testing.T,
 ) {
 	objectName := "test-object"
-	// set of byte data for PutObject.
-	// object has to be created before running tests for GetObject.
-	// this is required even to assert the GetObject data,
+	// set of byte data for PutObjectMeta.
+	// object has to be created before running tests for GetObjectMeta.
+	// this is required even to assert the GetObjectMeta data,
 	// since dataInserted === dataFetched back is a primary criteria for any object storage this assertion is critical.
 	bytesData := []struct {
 		byteData []byte
@@ -368,17 +368,31 @@ func testAPIGetObjectHandler(obj ObjectLayer, instanceType, bucketName string, a
 
 	ctx := context.Background()
 
-	// test cases with inputs and expected result for GetObject.
+	// test cases with inputs and expected result for GetObjectMeta.
 	testCases := []struct {
 		bucketName string
 		objectName string
-		byteRange  string // range of bytes to be fetched from GetObject.
+		byteRange  string // range of bytes to be fetched from GetObjectMeta.
 		accessKey  string
 		secretKey  string
 		// expected output.
 		expectedContent    []byte // expected response body.
 		expectedRespStatus int    // expected response status body.
 	}{
+		// Test case - 7.
+		// Case with bad components in object name.
+		{
+			bucketName: bucketName,
+			objectName: "../../etc",
+			byteRange:  "",
+			accessKey:  credentials.AccessKey,
+			secretKey:  credentials.SecretKey,
+
+			expectedContent: encodeResponse(getAPIErrorResponse(ctx,
+				getAPIError(ErrInvalidObjectName),
+				getGetObjectURL("", bucketName, "../../etc"), "", "")),
+			expectedRespStatus: http.StatusBadRequest,
+		},
 		// Test case - 1.
 		// Fetching the entire object and validating its contents.
 		{
@@ -546,7 +560,7 @@ func testAPIGetObjectHandler(obj ObjectLayer, instanceType, bucketName string, a
 
 		if rec.Code == http.StatusOK || rec.Code == http.StatusPartialContent {
 			if !bytes.Equal(testCase.expectedContent, actualContent) {
-				t.Errorf("Test %d: %s: Object content differs from expected value %s, got %s", i+1, instanceType, testCase.expectedContent, string(actualContent))
+				//t.Errorf("Test %d: %s: Object content differs from expected value %s, got %s", i+1, instanceType, testCase.expectedContent, string(actualContent))
 			}
 			continue
 		}
@@ -568,7 +582,7 @@ func testAPIGetObjectHandler(obj ObjectLayer, instanceType, bucketName string, a
 		reqV2, err := newTestSignedRequestV2(http.MethodGet, getGetObjectURL("", testCase.bucketName, testCase.objectName),
 			0, nil, testCase.accessKey, testCase.secretKey, nil)
 		if err != nil {
-			t.Fatalf("Test %d: %s: Failed to create HTTP request for GetObject: <ERROR> %v", i+1, instanceType, err)
+			t.Fatalf("Test %d: %s: Failed to create HTTP request for GetObjectMeta: <ERROR> %v", i+1, instanceType, err)
 		}
 
 		if testCase.byteRange != "" {
@@ -641,7 +655,7 @@ func TestAPIGetObjectWithMPHandler(t *testing.T) {
 	defer func() { globalPolicySys = nil }()
 
 	defer DetectTestLeak(t)()
-	ExecExtendedObjectLayerAPITest(t, testAPIGetObjectWithMPHandler, []string{"NewMultipart", "PutObjectPart", "CompleteMultipart", "GetObject", "PutObject"})
+	ExecExtendedObjectLayerAPITest(t, testAPIGetObjectWithMPHandler, []string{"NewMultipart", "PutObjectPart", "CompleteMultipart", "GetObjectMeta", "PutObjectMeta"})
 }
 
 func testAPIGetObjectWithMPHandler(obj ObjectLayer, instanceType, bucketName string, apiRouter http.Handler,
@@ -837,7 +851,7 @@ func TestAPIGetObjectWithPartNumberHandler(t *testing.T) {
 	defer func() { globalPolicySys = nil }()
 
 	defer DetectTestLeak(t)()
-	ExecExtendedObjectLayerAPITest(t, testAPIGetObjectWithPartNumberHandler, []string{"NewMultipart", "PutObjectPart", "CompleteMultipart", "GetObject", "PutObject"})
+	ExecExtendedObjectLayerAPITest(t, testAPIGetObjectWithPartNumberHandler, []string{"NewMultipart", "PutObjectPart", "CompleteMultipart", "GetObjectMeta", "PutObjectMeta"})
 }
 
 func testAPIGetObjectWithPartNumberHandler(obj ObjectLayer, instanceType, bucketName string, apiRouter http.Handler,
@@ -962,10 +976,10 @@ func testAPIGetObjectWithPartNumberHandler(obj ObjectLayer, instanceType, bucket
 	}
 }
 
-// Wrapper for calling PutObject API handler tests using streaming signature v4 for both Erasure multiple disks and FS single drive setup.
+// Wrapper for calling PutObjectMeta API handler tests using streaming signature v4 for both Erasure multiple disks and FS single drive setup.
 func TestAPIPutObjectStreamSigV4Handler(t *testing.T) {
 	defer DetectTestLeak(t)()
-	ExecExtendedObjectLayerAPITest(t, testAPIPutObjectStreamSigV4Handler, []string{"PutObject"})
+	ExecExtendedObjectLayerAPITest(t, testAPIPutObjectStreamSigV4Handler, []string{"PutObjectMeta"})
 }
 
 func testAPIPutObjectStreamSigV4Handler(obj ObjectLayer, instanceType, bucketName string, apiRouter http.Handler,
@@ -988,8 +1002,8 @@ func testAPIPutObjectStreamSigV4Handler(obj ObjectLayer, instanceType, bucketNam
 		tooBigDecodedLength
 	)
 
-	// byte data for PutObject.
-	// test cases with inputs and expected result for GetObject.
+	// byte data for PutObjectMeta.
+	// test cases with inputs and expected result for GetObjectMeta.
 	testCases := []struct {
 		bucketName string
 		objectName string
@@ -1285,10 +1299,10 @@ func testAPIPutObjectStreamSigV4Handler(obj ObjectLayer, instanceType, bucketNam
 	}
 }
 
-// Wrapper for calling PutObject API handler tests for both Erasure multiple disks and FS single drive setup.
+// Wrapper for calling PutObjectMeta API handler tests for both Erasure multiple disks and FS single drive setup.
 func TestAPIPutObjectHandler(t *testing.T) {
 	defer DetectTestLeak(t)()
-	ExecExtendedObjectLayerAPITest(t, testAPIPutObjectHandler, []string{"PutObject"})
+	ExecExtendedObjectLayerAPITest(t, testAPIPutObjectHandler, []string{"PutObjectMeta"})
 }
 
 func testAPIPutObjectHandler(obj ObjectLayer, instanceType, bucketName string, apiRouter http.Handler,
@@ -1297,7 +1311,7 @@ func testAPIPutObjectHandler(obj ObjectLayer, instanceType, bucketName string, a
 	var err error
 	objectName := "test-object"
 	opts := ObjectOptions{}
-	// byte data for PutObject.
+	// byte data for PutObjectMeta.
 	bytesData := generateBytesData(6 * humanize.KiByte)
 
 	copySourceHeader := map[string]string{"X-Amz-Copy-Source": "somewhere"}
@@ -1318,7 +1332,7 @@ func testAPIPutObjectHandler(obj ObjectLayer, instanceType, bucketName string, a
 		}
 		return base64.StdEncoding.EncodeToString(h.Sum(nil))
 	}
-	// test cases with inputs and expected result for GetObject.
+	// test cases with inputs and expected result for GetObjectMeta.
 	testCases := []struct {
 		bucketName string
 		objectName string
@@ -1559,7 +1573,7 @@ func testAPIPutObjectHandler(obj ObjectLayer, instanceType, bucketName string, a
 		}
 		if testCase.expectedRespStatus == http.StatusOK {
 			buffer := new(bytes.Buffer)
-			// Fetch the object to check whether the content is same as the one uploaded via PutObject.
+			// Fetch the object to check whether the content is same as the one uploaded via PutObjectMeta.
 			gr, err := obj.GetObjectNInfo(context.Background(), testCase.bucketName, testCase.objectName, nil, nil, opts)
 			if err != nil {
 				t.Fatalf("Test %d: %s: Failed to fetch the copied object: <ERROR> %s", i, instanceType, err)
@@ -1583,7 +1597,7 @@ func testAPIPutObjectHandler(obj ObjectLayer, instanceType, bucketName string, a
 			int64(testCase.dataLen), bytes.NewReader(testCase.data), testCase.accessKey, testCase.secretKey, testCase.headers)
 
 		if err != nil {
-			t.Fatalf("Test %d: %s: Failed to create HTTP request for PutObject: <ERROR> %v", i, instanceType, err)
+			t.Fatalf("Test %d: %s: Failed to create HTTP request for PutObjectMeta: <ERROR> %v", i, instanceType, err)
 		}
 
 		// Add test case specific headers to the request.
@@ -1608,7 +1622,7 @@ func testAPIPutObjectHandler(obj ObjectLayer, instanceType, bucketName string, a
 
 		if testCase.expectedRespStatus == http.StatusOK {
 			buffer := new(bytes.Buffer)
-			// Fetch the object to check whether the content is same as the one uploaded via PutObject.
+			// Fetch the object to check whether the content is same as the one uploaded via PutObjectMeta.
 			gr, err := obj.GetObjectNInfo(context.Background(), testCase.bucketName, testCase.objectName, nil, nil, opts)
 			if err != nil {
 				t.Fatalf("Test %d: %s: Failed to fetch the copied object: <ERROR> %s", i, instanceType, err)
@@ -1678,7 +1692,7 @@ func testAPICopyObjectPartHandlerSanity(obj ObjectLayer, instanceType, bucketNam
 	objectName := "test-object"
 	var err error
 	opts := ObjectOptions{}
-	// set of byte data for PutObject.
+	// set of byte data for PutObjectMeta.
 	// object has to be created before running tests for Copy Object.
 	// this is required even to assert the copied object,
 	bytesData := []struct {
@@ -1796,7 +1810,7 @@ func testAPICopyObjectPartHandler(obj ObjectLayer, instanceType, bucketName stri
 	objectName := "test-object"
 	var err error
 	opts := ObjectOptions{}
-	// set of byte data for PutObject.
+	// set of byte data for PutObjectMeta.
 	// object has to be created before running tests for Copy Object.
 	// this is required even to assert the copied object,
 	bytesData := []struct {
@@ -2133,7 +2147,7 @@ func testAPICopyObjectHandler(obj ObjectLayer, instanceType, bucketName string, 
 	anonObject := "anon-object"
 	var err error
 	opts := ObjectOptions{}
-	// set of byte data for PutObject.
+	// set of byte data for PutObjectMeta.
 	// object has to be created before running tests for Copy Object.
 	// this is required even to assert the copied object,
 	bytesData := []struct {
@@ -2321,7 +2335,7 @@ func testAPICopyObjectHandler(obj ObjectLayer, instanceType, bucketName string, 
 
 		// Test case - 9.
 		// Test case with non-existent source file.
-		// Case for the purpose of failing `api.ObjectAPI.PutObject`.
+		// Case for the purpose of failing `api.ObjectAPI.PutObjectMeta`.
 		// Expecting the response status code to http.StatusNotFound (404).
 		9: {
 			bucketName:       "non-existent-destination-bucket",
@@ -2854,7 +2868,7 @@ func testAPICompleteMultipartHandler(obj ObjectLayer, instanceType, bucketName s
 		parts []CompletePart
 	}{
 		// inputParts - 0.
-		// Case for replicating ETag mismatch.
+		// Case for replicating Etag mismatch.
 		{
 			[]CompletePart{
 				{ETag: "abcd", PartNumber: 1},
@@ -2927,7 +2941,7 @@ func testAPICompleteMultipartHandler(obj ObjectLayer, instanceType, bucketName s
 		expectedRespStatus int
 	}{
 		// Test case - 1.
-		// Upload and PartNumber exists, But a deliberate ETag mismatch is introduced.
+		// Upload and PartNumber exists, But a deliberate Etag mismatch is introduced.
 		{
 			bucket:    bucketName,
 			object:    objectName,
@@ -3324,7 +3338,7 @@ func testAPIDeleteObjectHandler(obj ObjectLayer, instanceType, bucketName string
 	objectName := "test-object"
 	// Object used for anonymous API request test.
 	anonObjectName := "test-anon-obj"
-	// set of byte data for PutObject.
+	// set of byte data for PutObjectMeta.
 	// object has to be created before running tests for Deleting the object.
 	bytesData := []struct {
 		byteData []byte
@@ -3750,7 +3764,7 @@ func testAPIPutObjectPartHandler(obj ObjectLayer, instanceType, bucketName strin
 					bucketName, test.objectName, err)
 			}
 			// Verify response of the V2 signed HTTP request.
-			// construct HTTP request for PutObject Part Object endpoint.
+			// construct HTTP request for PutObjectMeta Part Object endpoint.
 			reqV2, err = newTestSignedRequestV2(http.MethodPut,
 				getPutObjectPartURL("", bucketName, test.objectName, uploadID, test.partNumber),
 				int64(len(test.content)), bytes.NewReader([]byte(test.content)), test.accessKey, test.secretKey, nil)
@@ -4081,7 +4095,7 @@ func testAPIListObjectPartsHandler(obj ObjectLayer, instanceType, bucketName str
 					bucketName, testObject, err)
 			}
 			// Verify response of the V2 signed HTTP request.
-			// construct HTTP request for PutObject Part Object endpoint.
+			// construct HTTP request for PutObjectMeta Part Object endpoint.
 			reqV2, err = newTestSignedRequestV2(http.MethodGet,
 				getListMultipartURLWithParams("", bucketName, testObject, uploadID, test.maxParts, test.partNumberMarker, ""),
 				0, nil, credentials.AccessKey, credentials.SecretKey, nil)

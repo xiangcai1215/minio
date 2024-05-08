@@ -1547,7 +1547,7 @@ func (api objectAPIHandlers) CopyObjectHandler(w http.ResponseWriter, r *http.Re
 // Currently these keys are:
 //   - X-Amz-Server-Side-Encryption-Customer-Key
 //   - X-Amz-Copy-Source-Server-Side-Encryption-Customer-Key
-func (api objectAPIHandlers) HandPutObjectHandler(w http.ResponseWriter, r *http.Request) {
+func (api objectAPIHandlers) PutObjectHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := newContext(r, w, "PutObject")
 	defer logger.AuditLog(ctx, w, r, mustGetClaimsFromToken(r))
 

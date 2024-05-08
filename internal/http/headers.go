@@ -21,7 +21,7 @@ package http
 const (
 	LastModified       = "Last-Modified"
 	Date               = "Date"
-	ETag               = "ETag"
+	ETag               = "Etag"
 	ContentType        = "Content-Type"
 	ContentMD5         = "Content-Md5"
 	ContentEncoding    = "Content-Encoding"
@@ -197,7 +197,7 @@ const (
 	// Header indicates permanent delete replication status.
 	MinIODeleteReplicationStatus = "X-Minio-Replication-Delete-Status"
 	// Header indicates delete-marker replication status.
-	MinIODeleteMarkerReplicationStatus = "X-Minio-Replication-DeleteMarker-Status"
+	MinIODeleteMarkerReplicationStatus = "X-Minio-Replication-IsDeleteMarker-Status"
 	// Header indicates if its a GET/HEAD proxy request for active-active replication
 	MinIOSourceProxyRequest = "X-Minio-Source-Proxy-Request"
 	// Header indicates that this request is a replication request to create a REPLICA

@@ -332,8 +332,8 @@ func (s *TestSuiteIAM) TestUserPolicyEscalationBug(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta",
     "s3:ListBucket"
    ],
    "Resource": [
@@ -536,8 +536,8 @@ func (s *TestSuiteIAM) TestPolicyCreate(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta",
     "s3:ListBucket"
    ],
    "Resource": [
@@ -643,8 +643,8 @@ func (s *TestSuiteIAM) TestCannedPolicies(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta",
     "s3:ListBucket"
    ],
    "Resource": [
@@ -666,7 +666,7 @@ func (s *TestSuiteIAM) TestCannedPolicies(c *check) {
 	}
 
 	infoStr := string(info)
-	if !strings.Contains(infoStr, `"s3:PutObject"`) || !strings.Contains(infoStr, ":"+bucket+"/") {
+	if !strings.Contains(infoStr, `"s3:PutObjectMeta"`) || !strings.Contains(infoStr, ":"+bucket+"/") {
 		c.Fatalf("policy contains unexpected content!")
 	}
 }
@@ -688,8 +688,8 @@ func (s *TestSuiteIAM) TestGroupAddRemove(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta",
     "s3:ListBucket"
    ],
    "Resource": [
@@ -848,8 +848,8 @@ func (s *TestSuiteIAM) TestServiceAccountOpsByUser(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta",
     "s3:ListBucket"
    ],
    "Resource": [
@@ -929,8 +929,8 @@ func (s *TestSuiteIAM) TestServiceAccountOpsByAdmin(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta",
     "s3:ListBucket"
    ],
    "Resource": [
@@ -1103,8 +1103,8 @@ func (s *TestSuiteIAM) TestAccMgmtPlugin(c *check) {
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject"
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta"
    ],
    "Resource": [
     "arn:aws:s3:::%s/*"
@@ -1363,8 +1363,8 @@ func (c *check) assertSvcAccSessionPolicyUpdate(ctx context.Context, s *TestSuit
   {
    "Effect": "Allow",
    "Action": [
-    "s3:PutObject",
-    "s3:GetObject"
+    "s3:PutObjectMeta",
+    "s3:GetObjectMeta"
    ],
    "Resource": [
     "arn:aws:s3:::%s/*"
