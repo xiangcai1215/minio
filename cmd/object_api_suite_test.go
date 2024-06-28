@@ -70,7 +70,7 @@ func (r *testOneByteReadNoEOF) Read(p []byte) (n int, err error) {
 	return n, nil
 }
 
-// Wrapper for calling testMakeBucket for both Erasure and FS.
+// Wrapper for calling testMakeBucket.
 func TestMakeBucket(t *testing.T) {
 	ExecObjectLayerTest(t, testMakeBucket)
 }
@@ -83,7 +83,7 @@ func testMakeBucket(obj ObjectLayer, instanceType string, t TestErrHandler) {
 	}
 }
 
-// Wrapper for calling testMultipartObjectCreation for both Erasure and FS.
+// Wrapper for calling testMultipartObjectCreation.
 func TestMultipartObjectCreation(t *testing.T) {
 	ExecExtendedObjectLayerTest(t, testMultipartObjectCreation)
 }
@@ -129,7 +129,7 @@ func testMultipartObjectCreation(obj ObjectLayer, instanceType string, t TestErr
 	}
 }
 
-// Wrapper for calling testMultipartObjectAbort for both Erasure and FS.
+// Wrapper for calling testMultipartObjectAbort.
 func TestMultipartObjectAbort(t *testing.T) {
 	ExecObjectLayerTest(t, testMultipartObjectAbort)
 }
@@ -175,7 +175,7 @@ func testMultipartObjectAbort(obj ObjectLayer, instanceType string, t TestErrHan
 	}
 }
 
-// Wrapper for calling testMultipleObjectCreation for both Erasure and FS.
+// Wrapper for calling testMultipleObjectCreation.
 func TestMultipleObjectCreation(t *testing.T) {
 	ExecExtendedObjectLayerTest(t, testMultipleObjectCreation)
 }
@@ -232,7 +232,7 @@ func testMultipleObjectCreation(obj ObjectLayer, instanceType string, t TestErrH
 	}
 }
 
-// Wrapper for calling TestPaging for both Erasure and FS.
+// Wrapper for calling TestPaging.
 func TestPaging(t *testing.T) {
 	ExecObjectLayerTest(t, testPaging)
 }
@@ -436,7 +436,7 @@ func testPaging(obj ObjectLayer, instanceType string, t TestErrHandler) {
 	}
 }
 
-// Wrapper for calling testObjectOverwriteWorks for both Erasure and FS.
+// Wrapper for calling testObjectOverwriteWorks.
 func TestObjectOverwriteWorks(t *testing.T) {
 	ExecObjectLayerTest(t, testObjectOverwriteWorks)
 }
@@ -473,7 +473,7 @@ func testObjectOverwriteWorks(obj ObjectLayer, instanceType string, t TestErrHan
 	}
 }
 
-// Wrapper for calling testNonExistantBucketOperations for both Erasure and FS.
+// Wrapper for calling testNonExistantBucketOperations.
 func TestNonExistantBucketOperations(t *testing.T) {
 	ExecObjectLayerTest(t, testNonExistantBucketOperations)
 }
@@ -490,7 +490,7 @@ func testNonExistantBucketOperations(obj ObjectLayer, instanceType string, t Tes
 	}
 }
 
-// Wrapper for calling testBucketRecreateFails for both Erasure and FS.
+// Wrapper for calling testBucketRecreateFails.
 func TestBucketRecreateFails(t *testing.T) {
 	ExecObjectLayerTest(t, testBucketRecreateFails)
 }
@@ -591,7 +591,7 @@ func ExecExtendedObjectLayerTest(t *testing.T, objTest objTestType) {
 	})
 }
 
-// Wrapper for calling testPutObject for both Erasure and FS.
+// Wrapper for calling testPutObject.
 func TestPutObject(t *testing.T) {
 	ExecExtendedObjectLayerTest(t, testPutObject)
 }
@@ -635,7 +635,7 @@ func testPutObject(obj ObjectLayer, instanceType string, t TestErrHandler) {
 	}
 }
 
-// Wrapper for calling testPutObjectInSubdir for both Erasure and FS.
+// Wrapper for calling testPutObjectInSubdir.
 func TestPutObjectInSubdir(t *testing.T) {
 	ExecExtendedObjectLayerTest(t, testPutObjectInSubdir)
 }
@@ -667,7 +667,7 @@ func testPutObjectInSubdir(obj ObjectLayer, instanceType string, t TestErrHandle
 	}
 }
 
-// Wrapper for calling testListBuckets for both Erasure and FS.
+// Wrapper for calling testListBuckets.
 func TestListBuckets(t *testing.T) {
 	ExecObjectLayerTest(t, testListBuckets)
 }
@@ -726,7 +726,7 @@ func testListBuckets(obj ObjectLayer, instanceType string, t TestErrHandler) {
 	}
 }
 
-// Wrapper for calling testListBucketsOrder for both Erasure and FS.
+// Wrapper for calling testListBucketsOrder.
 func TestListBucketsOrder(t *testing.T) {
 	ExecObjectLayerTest(t, testListBucketsOrder)
 }
@@ -760,7 +760,7 @@ func testListBucketsOrder(obj ObjectLayer, instanceType string, t TestErrHandler
 	}
 }
 
-// Wrapper for calling testListObjectsTestsForNonExistantBucket for both Erasure and FS.
+// Wrapper for calling testListObjectsTestsForNonExistantBucket.
 func TestListObjectsTestsForNonExistantBucket(t *testing.T) {
 	ExecObjectLayerTest(t, testListObjectsTestsForNonExistantBucket)
 }
@@ -782,7 +782,7 @@ func testListObjectsTestsForNonExistantBucket(obj ObjectLayer, instanceType stri
 	}
 }
 
-// Wrapper for calling testNonExistantObjectInBucket for both Erasure and FS.
+// Wrapper for calling testNonExistantObjectInBucket.
 func TestNonExistantObjectInBucket(t *testing.T) {
 	ExecObjectLayerTest(t, testNonExistantObjectInBucket)
 }
@@ -809,7 +809,7 @@ func testNonExistantObjectInBucket(obj ObjectLayer, instanceType string, t TestE
 	}
 }
 
-// Wrapper for calling testGetDirectoryReturnsObjectNotFound for both Erasure and FS.
+// Wrapper for calling testGetDirectoryReturnsObjectNotFound.
 func TestGetDirectoryReturnsObjectNotFound(t *testing.T) {
 	ExecObjectLayerTest(t, testGetDirectoryReturnsObjectNotFound)
 }
@@ -852,7 +852,7 @@ func testGetDirectoryReturnsObjectNotFound(obj ObjectLayer, instanceType string,
 	}
 }
 
-// Wrapper for calling testContentType for both Erasure and FS.
+// Wrapper for calling testContentType.
 func TestContentType(t *testing.T) {
 	ExecObjectLayerTest(t, testContentType)
 }

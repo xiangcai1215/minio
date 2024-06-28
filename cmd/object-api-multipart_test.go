@@ -32,7 +32,7 @@ import (
 	"github.com/minio/minio/internal/ioutil"
 )
 
-// Wrapper for calling NewMultipartUpload tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling NewMultipartUpload tests.
 func TestObjectNewMultipartUpload(t *testing.T) {
 	if runtime.GOOS == globalWindowsOSName {
 		t.Skip()
@@ -83,7 +83,7 @@ func testObjectNewMultipartUpload(obj ObjectLayer, instanceType string, t TestEr
 	}
 }
 
-// Wrapper for calling AbortMultipartUpload tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling AbortMultipartUpload tests.
 func TestObjectAbortMultipartUpload(t *testing.T) {
 	ExecObjectLayerTest(t, testObjectAbortMultipartUpload)
 }
@@ -139,7 +139,7 @@ func testObjectAbortMultipartUpload(obj ObjectLayer, instanceType string, t Test
 	}
 }
 
-// Wrapper for calling isUploadIDExists tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling isUploadIDExists tests.
 func TestObjectAPIIsUploadIDExists(t *testing.T) {
 	ExecObjectLayerTest(t, testObjectAPIIsUploadIDExists)
 }
@@ -170,7 +170,7 @@ func testObjectAPIIsUploadIDExists(obj ObjectLayer, instanceType string, t TestE
 	}
 }
 
-// Wrapper for calling PutObjectPart tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling PutObjectPart tests.
 func TestObjectAPIPutObjectPart(t *testing.T) {
 	ExecExtendedObjectLayerTest(t, testObjectAPIPutObjectPart)
 }
@@ -315,7 +315,7 @@ func testObjectAPIPutObjectPart(obj ObjectLayer, instanceType string, t TestErrH
 	}
 }
 
-// Wrapper for calling TestListMultipartUploads tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling TestListMultipartUploads tests.
 func TestListMultipartUploads(t *testing.T) {
 	ExecExtendedObjectLayerTest(t, testListMultipartUploads)
 }
@@ -1186,7 +1186,7 @@ func testListMultipartUploads(obj ObjectLayer, instanceType string, t TestErrHan
 	}
 }
 
-// Wrapper for calling TestListObjectPartsDiskNotFound tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling TestListObjectPartsDiskNotFound tests.
 func TestListObjectPartsDiskNotFound(t *testing.T) {
 	ExecObjectLayerDiskAlteredTest(t, testListObjectPartsDiskNotFound)
 }
@@ -1439,7 +1439,7 @@ func testListObjectPartsDiskNotFound(obj ObjectLayer, instanceType string, disks
 	}
 }
 
-// Wrapper for calling TestListObjectParts tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling TestListObjectParts tests.
 func TestListObjectParts(t *testing.T) {
 	ExecObjectLayerTest(t, testListObjectParts)
 }

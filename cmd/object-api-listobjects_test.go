@@ -1101,7 +1101,7 @@ func testDeleteObjectVersion(obj ObjectLayer, instanceType string, t1 TestErrHan
 	}
 }
 
-// Wrapper for calling ListObjectVersions tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling ListObjectVersions tests.
 func TestListObjectVersions(t *testing.T) {
 	ExecObjectLayerTest(t, testListObjectVersions)
 }
@@ -1741,7 +1741,7 @@ func testListObjectVersions(obj ObjectLayer, instanceType string, t1 TestErrHand
 	}
 }
 
-// Wrapper for calling ListObjects continuation tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling ListObjects continuation tests.
 func TestListObjectsContinuation(t *testing.T) {
 	ExecObjectLayerTest(t, testListObjectsContinuation)
 }

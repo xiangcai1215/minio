@@ -25,7 +25,7 @@ import (
 	"testing"
 )
 
-// Wrapper for calling DeleteObject tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling DeleteObject tests.
 func TestDeleteObject(t *testing.T) {
 	ExecObjectLayerTest(t, testDeleteObject)
 }

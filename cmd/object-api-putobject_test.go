@@ -36,7 +36,7 @@ func md5Header(data []byte) map[string]string {
 	return map[string]string{"etag": getMD5Hash(data)}
 }
 
-// Wrapper for calling PutObjectMeta tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling PutObjectMeta tests.
 func TestObjectAPIPutObjectSingle(t *testing.T) {
 	ExecExtendedObjectLayerTest(t, testObjectAPIPutObject)
 }
@@ -324,7 +324,7 @@ func testObjectAPIPutObjectDiskNotFound(obj ObjectLayer, instanceType string, di
 	}
 }
 
-// Wrapper for calling PutObjectMeta tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling PutObjectMeta tests.
 func TestObjectAPIPutObjectStaleFiles(t *testing.T) {
 	ExecObjectLayerStaleFilesTest(t, testObjectAPIPutObjectStaleFiles)
 }
@@ -369,7 +369,7 @@ func testObjectAPIPutObjectStaleFiles(obj ObjectLayer, instanceType string, disk
 	}
 }
 
-// Wrapper for calling Multipart PutObjectMeta tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling Multipart PutObjectMeta tests.
 func TestObjectAPIMultipartPutObjectStaleFiles(t *testing.T) {
 	ExecObjectLayerStaleFilesTest(t, testObjectAPIMultipartPutObjectStaleFiles)
 }

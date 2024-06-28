@@ -1798,7 +1798,7 @@ func testAPICopyObjectPartHandlerSanity(obj ObjectLayer, instanceType, bucketNam
 	}
 }
 
-// Wrapper for calling Copy Object Part API handler tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling Copy Object Part API handler tests.
 func TestAPICopyObjectPartHandler(t *testing.T) {
 	defer DetectTestLeak(t)()
 	ExecExtendedObjectLayerAPITest(t, testAPICopyObjectPartHandler, []string{"CopyObjectPart"})
@@ -2130,7 +2130,7 @@ func testAPICopyObjectPartHandler(obj ObjectLayer, instanceType, bucketName stri
 	ExecObjectLayerAPINilTest(t, nilBucket, nilObject, instanceType, apiRouter, nilReq)
 }
 
-// Wrapper for calling Copy Object API handler tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling Copy Object API handler tests.
 func TestAPICopyObjectHandler(t *testing.T) {
 	defer DetectTestLeak(t)()
 	ExecExtendedObjectLayerAPITest(t, testAPICopyObjectHandler, []string{"CopyObject"})
@@ -2590,7 +2590,7 @@ func testAPICopyObjectHandler(obj ObjectLayer, instanceType, bucketName string, 
 	ExecObjectLayerAPINilTest(t, nilBucket, nilObject, instanceType, apiRouter, nilReq)
 }
 
-// Wrapper for calling NewMultipartUpload tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling NewMultipartUpload tests.
 // First register the HTTP handler for NewMutlipartUpload, then a HTTP request for NewMultipart upload is made.
 // The UploadID from the response body is parsed and its existence is asserted with an attempt to ListParts using it.
 func TestAPINewMultipartHandler(t *testing.T) {
@@ -2731,7 +2731,7 @@ func testAPINewMultipartHandler(obj ObjectLayer, instanceType, bucketName string
 	ExecObjectLayerAPINilTest(t, nilBucket, nilObject, instanceType, apiRouter, nilReq)
 }
 
-// Wrapper for calling NewMultipartUploadParallel tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling NewMultipartUploadParallel tests.
 // The objective of the test is to initialte multipart upload on the same object 10 times concurrently,
 // The UploadID from the response body is parsed and its existence is asserted with an attempt to ListParts using it.
 func TestAPINewMultipartHandlerParallel(t *testing.T) {

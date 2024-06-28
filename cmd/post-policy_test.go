@@ -174,7 +174,7 @@ func testPostPolicyReservedBucketExploit(obj ObjectLayer, instanceType string, d
 	}
 }
 
-// Wrapper for calling TestPostPolicyBucketHandler tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling TestPostPolicyBucketHandler tests.
 func TestPostPolicyBucketHandler(t *testing.T) {
 	ExecObjectLayerTest(t, testPostPolicyBucketHandler)
 }
@@ -484,7 +484,7 @@ func testPostPolicyBucketHandler(obj ObjectLayer, instanceType string, t TestErr
 	}
 }
 
-// Wrapper for calling TestPostPolicyBucketHandlerRedirect tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling TestPostPolicyBucketHandlerRedirect tests.
 func TestPostPolicyBucketHandlerRedirect(t *testing.T) {
 	ExecObjectLayerTest(t, testPostPolicyBucketHandlerRedirect)
 }

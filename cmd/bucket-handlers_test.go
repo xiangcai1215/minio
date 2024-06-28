@@ -30,7 +30,7 @@ import (
 	"github.com/minio/minio/internal/auth"
 )
 
-// Wrapper for calling RemoveBucket HTTP handler tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling RemoveBucket HTTP handler tests.
 func TestRemoveBucketHandler(t *testing.T) {
 	ExecObjectLayerAPITest(t, testRemoveBucketHandler, []string{"RemoveBucket"})
 }
@@ -76,7 +76,7 @@ func testRemoveBucketHandler(obj ObjectLayer, instanceType, bucketName string, a
 	}
 }
 
-// Wrapper for calling GetBucketPolicy HTTP handler tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling GetBucketPolicy HTTP handler tests.
 func TestGetBucketLocationHandler(t *testing.T) {
 	ExecObjectLayerAPITest(t, testGetBucketLocationHandler, []string{"GetBucketLocation"})
 }
@@ -218,7 +218,7 @@ func testGetBucketLocationHandler(obj ObjectLayer, instanceType, bucketName stri
 	ExecObjectLayerAPINilTest(t, nilBucket, "", instanceType, apiRouter, nilReq)
 }
 
-// Wrapper for calling HeadBucket HTTP handler tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling HeadBucket HTTP handler tests.
 func TestHeadBucketHandler(t *testing.T) {
 	ExecObjectLayerAPITest(t, testHeadBucketHandler, []string{"HeadBucket"})
 }
@@ -320,7 +320,7 @@ func testHeadBucketHandler(obj ObjectLayer, instanceType, bucketName string, api
 	ExecObjectLayerAPINilTest(t, nilBucket, "", instanceType, apiRouter, nilReq)
 }
 
-// Wrapper for calling TestListMultipartUploadsHandler tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling TestListMultipartUploadsHandler tests.
 func TestListMultipartUploadsHandler(t *testing.T) {
 	ExecObjectLayerAPITest(t, testListMultipartUploadsHandler, []string{"ListMultipartUploads"})
 }
@@ -556,7 +556,7 @@ func testListMultipartUploadsHandler(obj ObjectLayer, instanceType, bucketName s
 	ExecObjectLayerAPINilTest(t, nilBucket, "", instanceType, apiRouter, nilReq)
 }
 
-// Wrapper for calling TestListBucketsHandler tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling TestListBucketsHandler tests.
 func TestListBucketsHandler(t *testing.T) {
 	ExecObjectLayerAPITest(t, testListBucketsHandler, []string{"ListBuckets"})
 }
@@ -647,7 +647,7 @@ func testListBucketsHandler(obj ObjectLayer, instanceType, bucketName string, ap
 	ExecObjectLayerAPINilTest(t, "", "", instanceType, apiRouter, nilReq)
 }
 
-// Wrapper for calling DeleteMultipleObjects HTTP handler tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling DeleteMultipleObjects HTTP handler tests.
 func TestAPIDeleteMultipleObjectsHandler(t *testing.T) {
 	ExecObjectLayerAPITest(t, testAPIDeleteMultipleObjectsHandler, []string{"DeleteMultipleObjects", "PutBucketPolicy"})
 }

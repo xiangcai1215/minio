@@ -23,7 +23,7 @@ import (
 	"testing"
 )
 
-// Wrapper for calling GetObjectInfo tests for both Erasure multiple disks and single node setup.
+// Wrapper for calling GetObjectInfo tests.
 func TestGetObjectInfo(t *testing.T) {
 	ExecObjectLayerTest(t, testGetObjectInfo)
 }
